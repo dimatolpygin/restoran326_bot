@@ -1,0 +1,119 @@
+---
+const features = [
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+    title: 'Мультимодельность',
+    desc: 'Переключайся между GPT-4, Claude, Gemini и десятками других моделей одним кликом. Сравнивай ответы в реальном времени.',
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.24 7.76 2.83-2.83"/><path d="M18 12h4"/><path d="m16.24 16.24 2.83 2.83"/><path d="M12 18v4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M2 12h4"/><path d="m4.93 4.93 2.83 2.83"/></svg>`,
+    title: 'Контекст без ограничений',
+    desc: 'Длинные диалоги, загрузка документов, полная история переписки. Модели помнят весь контекст вашего проекта.',
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    title: 'API-доступ',
+    desc: 'Встраивай мощь AI в свои приложения через единый REST API. Одна интеграция — все модели. Документация за 5 минут.',
+    badge: 'скоро',
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    title: 'Полная приватность',
+    desc: 'Твои диалоги не используются для обучения моделей. Шифрование в покое и в транзите. Полное удаление по запросу.',
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+    title: '50+ языков',
+    desc: 'Общайся на русском, английском, китайском или любом другом языке. ИИ отвечает на том же языке, на котором спрашиваешь.',
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>`,
+    title: 'Файлы и изображения',
+    desc: 'Загружай PDF, DOCX, изображения и таблицы прямо в чат. Анализируй данные, задавай вопросы по документу.',
+  },
+];
+---
+
+<section id="features" style="padding: 96px 24px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div
+      style="
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 16px;
+      "
+    >
+      Возможности
+    </div>
+    <div
+      style="
+        font-size: clamp(28px, 3.5vw, 48px);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+        margin-bottom: 16px;
+        background: linear-gradient(180deg, #FFF 0%, #888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      "
+    >
+      Всё что нужно<br />для работы с ИИ
+    </div>
+
+    <div
+      style="
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 56px;
+      "
+    >
+      {
+        features.map((f) => (
+          <div
+            class="feature-card"
+            data-reveal
+            style="
+              background: #111111;
+              border: 1px solid #2A2A2A;
+              border-radius: 20px;
+              padding: 32px;
+              position: relative;
+              overflow: hidden;
+              box-shadow:
+                6px 6px 20px rgba(0,0,0,0.6),
+                -2px -2px 8px rgba(255,255,255,0.04),
+                inset 0 1px 0 rgba(255,255,255,0.06);
+            "
+          >
+            <div
+              style="
+                width: 48px; height: 48px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+                border: 1px solid #333;
+                display: flex; align-items: center; justify-content: center;
+                margin-bottom: 20px;
+                box-shadow: 3px 3px 10px rgba(0,0,0,0.5), -1px -1px 4px rgba(255,255,255,0.05);
+              "
+              set:html={f.icon}
+            />
+            <div style="font-size: 18px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.4px;">
+              {f.title}
+              {f.badge && (
+                <span style="font-size: 11px; font-weight: 500; color: #555; letter-spacing: .5px; margin-left: 6px;">
+                  {f.badge}
+                </span>
+              )}
+            </div>
+            <p style="font-size: 14px; color: #A1A1AA; line-height: 1.6;">{f.desc}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

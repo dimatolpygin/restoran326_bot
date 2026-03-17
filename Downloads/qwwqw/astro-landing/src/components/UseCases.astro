@@ -1,0 +1,134 @@
+---
+const cases = [
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+    title: 'Разработчики',
+    desc: 'Пишут код, дебажат баги, ревьюят PR и разбираются в незнакомых кодовых базах. GPT-4 для кода, Claude для объяснений архитектуры.',
+    tags: ['Генерация кода', 'Дебаг', 'Code Review', 'Документация'],
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+    title: 'Студенты',
+    desc: 'Объясняют сложные концепции, проверяют эссе, готовятся к экзаменам. ИИ как личный репетитор, доступный 24/7.',
+    tags: ['Учёба', 'Рефераты', 'Конспекты', 'Подготовка к экзаменам'],
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
+    title: 'Бизнес',
+    desc: 'Анализируют данные, составляют отчёты, пишут деловые письма и автоматизируют рутину. Командный доступ с единым биллингом.',
+    tags: ['Аналитика', 'Отчёты', 'Email', 'API'],
+  },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>`,
+    title: 'Контент-мейкеры',
+    desc: 'Генерируют идеи, пишут сценарии, посты и SEO-статьи. Разные модели — разный стиль письма. Всё в одном месте.',
+    tags: ['Копирайтинг', 'SEO', 'Сценарии', 'SMM'],
+  },
+];
+---
+
+<section id="usecases" style="padding: 96px 24px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div
+      style="
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 16px;
+      "
+    >
+      Примеры
+    </div>
+    <div
+      style="
+        font-size: clamp(28px, 3.5vw, 48px);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+        margin-bottom: 16px;
+        background: linear-gradient(180deg, #FFF 0%, #888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      "
+    >
+      Кто уже использует<br />NeuralChat
+    </div>
+    <p style="font-size: 16px; color: #A1A1AA; max-width: 500px; line-height: 1.6;">
+      От разработчика-одиночки до корпоративной команды — продукт работает для всех.
+    </p>
+
+    <div
+      style="
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-top: 56px;
+      "
+    >
+      {
+        cases.map((c) => (
+          <div
+            class="usecase-card"
+            data-reveal
+            style="
+              background: #111111;
+              border: 1px solid #2A2A2A;
+              border-radius: 20px;
+              padding: 36px;
+              display: flex;
+              gap: 24px;
+              align-items: flex-start;
+              position: relative;
+              overflow: hidden;
+              box-shadow:
+                6px 6px 20px rgba(0,0,0,0.5),
+                -2px -2px 8px rgba(255,255,255,0.03),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+            "
+          >
+            <div
+              style="
+                font-size: 0;
+                flex-shrink: 0;
+                width: 56px; height: 56px;
+                background: linear-gradient(135deg, #222, #191919);
+                border: 1px solid #2A2A2A;
+                border-radius: 14px;
+                display: flex; align-items: center; justify-content: center;
+                box-shadow: 3px 3px 10px rgba(0,0,0,0.5), -1px -1px 4px rgba(255,255,255,0.04);
+              "
+              set:html={c.icon}
+            />
+            <div>
+              <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px;">
+                {c.title}
+              </div>
+              <p style="font-size: 14px; color: #A1A1AA; line-height: 1.6; margin-bottom: 16px;">
+                {c.desc}
+              </p>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                {c.tags.map((tag) => (
+                  <span
+                    style="
+                      padding: 3px 10px;
+                      border-radius: 999px;
+                      background: rgba(255,255,255,0.04);
+                      border: 1px solid rgba(255,255,255,0.07);
+                      font-size: 11px;
+                      color: #666;
+                    "
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

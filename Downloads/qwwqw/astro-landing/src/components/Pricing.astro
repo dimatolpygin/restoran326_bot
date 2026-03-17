@@ -1,0 +1,216 @@
+---
+const plans = [
+  {
+    badge: 'Free',
+    name: 'Бесплатно',
+    desc: 'Попробуй все модели без кредитной карты',
+    amount: '0',
+    period: '₽ / мес',
+    featured: false,
+    features: [
+      { text: '50 запросов в день', enabled: true },
+      { text: 'GPT-3.5, Claude Haiku, Gemini Flash', enabled: true },
+      { text: 'История за 7 дней', enabled: true },
+      { text: 'Загрузка файлов до 5 МБ', enabled: true },
+      { text: 'Доступ ко всем моделям', enabled: false },
+      { text: 'API-доступ', enabled: false },
+      { text: 'Командный доступ', enabled: false },
+    ],
+    btnText: 'Начать бесплатно',
+    btnPrimary: false,
+  },
+  {
+    badge: 'Pro · Популярный',
+    name: 'Pro',
+    desc: 'Безлимитный доступ ко всем топ-моделям',
+    amount: '990',
+    period: '₽ / мес',
+    featured: true,
+    features: [
+      { text: 'Безлимитные запросы', enabled: true },
+      { text: 'Все 50+ моделей (GPT-4o, Claude 3.5, Gemini Pro…)', enabled: true },
+      { text: 'Полная история диалогов', enabled: true },
+      { text: 'Загрузка файлов до 100 МБ', enabled: true },
+      { text: 'Приоритетный ответ', enabled: true },
+      { text: 'API-доступ', enabled: false },
+      { text: 'Командный доступ', enabled: false },
+    ],
+    btnText: 'Попробовать Pro',
+    btnPrimary: true,
+  },
+  {
+    badge: 'Team',
+    name: 'Команда',
+    desc: 'Для команд и компаний с единым биллингом',
+    amount: '3 990',
+    period: '₽ / мес',
+    featured: false,
+    features: [
+      { text: 'Всё из Pro', enabled: true },
+      { text: 'До 10 участников', enabled: true },
+      { text: 'Общие чаты и шаблоны', enabled: true },
+      { text: 'API-доступ (1M токенов/мес)', enabled: true },
+      { text: 'Аналитика использования', enabled: true },
+      { text: 'Приоритетная поддержка', enabled: true },
+      { text: 'SSO и управление правами', enabled: true },
+    ],
+    btnText: 'Связаться с нами',
+    btnPrimary: false,
+  },
+];
+---
+
+<section id="pricing" style="padding: 96px 24px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div
+      style="
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 16px;
+      "
+    >
+      Цены
+    </div>
+    <div
+      style="
+        font-size: clamp(28px, 3.5vw, 48px);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+        margin-bottom: 16px;
+        background: linear-gradient(180deg, #FFF 0%, #888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      "
+    >
+      Честные тарифы.<br />Без сюрпризов.
+    </div>
+    <p style="font-size: 16px; color: #A1A1AA; max-width: 500px; line-height: 1.6;">
+      Начни бесплатно. Переходи на Pro когда готов. Отменяй в любой момент.
+    </p>
+
+    <div
+      style="
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 56px;
+        align-items: start;
+      "
+    >
+      {
+        plans.map((plan) => (
+          <div
+            data-reveal
+            style={`
+              border-radius: 24px;
+              padding: 36px;
+              position: relative;
+              overflow: hidden;
+              ${plan.featured
+                ? `background: linear-gradient(145deg, #1a1a1a, #141414); border: 1px solid #3a3a3a; box-shadow: 8px 8px 30px rgba(0,0,0,0.7), -3px -3px 12px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.08);`
+                : `background: #111111; border: 1px solid #2A2A2A; box-shadow: 6px 6px 20px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.05);`
+              }
+            `}
+          >
+            <div
+              style="
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 999px;
+                background: rgba(255,255,255,0.08);
+                border: 1px solid rgba(255,255,255,0.12);
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.8px;
+                text-transform: uppercase;
+                color: #A1A1AA;
+                margin-bottom: 20px;
+              "
+            >
+              {plan.badge}
+            </div>
+
+            <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px;">
+              {plan.name}
+            </div>
+            <p style="font-size: 13px; color: #555; margin-bottom: 28px; line-height: 1.5;">{plan.desc}</p>
+
+            <div style="margin-bottom: 32px;">
+              <span
+                style="
+                  font-size: 48px;
+                  font-weight: 800;
+                  letter-spacing: -2px;
+                  background: linear-gradient(180deg, #FFF 0%, #888 100%);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                  line-height: 1;
+                "
+              >
+                {plan.amount}
+              </span>
+              <span style="font-size: 14px; color: #555; margin-left: 4px;">{plan.period}</span>
+            </div>
+
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+              {plan.features.map((f) => (
+                <li
+                  style={`
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 13px;
+                    color: #A1A1AA;
+                    ${!f.enabled ? 'opacity: 0.35;' : ''}
+                  `}
+                >
+                  <span
+                    style="
+                      width: 18px; height: 18px;
+                      border-radius: 50%;
+                      background: rgba(255,255,255,0.06);
+                      border: 1px solid rgba(255,255,255,0.1);
+                      display: inline-flex; align-items: center; justify-content: center;
+                      font-size: 10px;
+                      color: #888;
+                      flex-shrink: 0;
+                      line-height: 1;
+                    "
+                  >
+                    {f.enabled ? '✓' : '×'}
+                  </span>
+                  {f.text}
+                </li>
+              ))}
+            </ul>
+
+            <button
+              style={`
+                width: 100%;
+                padding: 13px 20px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-family: inherit;
+                ${plan.btnPrimary
+                  ? `background: #FFFFFF; color: #0A0A0A; border: none;`
+                  : `background: rgba(255,255,255,0.05); color: #A1A1AA; border: 1px solid #2A2A2A;`
+                }
+              `}
+            >
+              {plan.btnText}
+            </button>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

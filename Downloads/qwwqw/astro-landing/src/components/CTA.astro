@@ -1,0 +1,126 @@
+---
+const pills = ['GPT-4o', 'Claude 3.5', 'Gemini Pro', 'Mistral', 'и ещё 46+'];
+---
+
+<section
+  style="
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 96px 24px;
+  "
+>
+  <div
+    style="
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    "
+  />
+  <div style="max-width: 1100px; margin: 0 auto; position: relative; z-index: 1;">
+    <div
+      style="
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 16px;
+        display: block;
+        text-align: center;
+      "
+    >
+      Начало
+    </div>
+    <div
+      style="
+        font-size: clamp(36px, 4.5vw, 64px);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        background: linear-gradient(180deg, #FFF 0%, #888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+      "
+    >
+      Готов начать?
+    </div>
+    <p
+      style="
+        font-size: 16px;
+        color: #A1A1AA;
+        max-width: 400px;
+        margin: 0 auto 40px;
+        text-align: center;
+        line-height: 1.6;
+      "
+    >
+      Присоединяйся к двум миллионам пользователей. Регистрация — 30 секунд.
+    </p>
+
+    <button
+      class="motion-btn"
+      style="
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 40px;
+        border-radius: 999px;
+        border: none;
+        background: #FFFFFF;
+        color: #0A0A0A;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 14px rgba(255,255,255,0.15);
+        margin: 0 auto;
+        font-family: inherit;
+      "
+      onmouseover="this.style.transform='scale(1.03)'"
+      onmouseout="this.style.transform='scale(1)'"
+    >
+      Начать бесплатно
+      <span style="font-size: 18px;">→</span>
+    </button>
+
+    <p style="margin-top: 20px; font-size: 13px; color: #444;">
+      Бесплатно навсегда · 50 запросов в день · Без кредитной карты
+    </p>
+
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 32px auto 0;
+        flex-wrap: wrap;
+      "
+    >
+      <span style="font-size: 12px; color: #3a3a3a; margin-right: 4px;">Включает:</span>
+      {
+        pills.map((pill) => (
+          <span
+            style="
+              padding: 6px 14px;
+              border-radius: 999px;
+              background: rgba(255,255,255,0.04);
+              border: 1px solid rgba(255,255,255,0.07);
+              font-size: 12px;
+              color: #555;
+            "
+          >
+            {pill}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</section>

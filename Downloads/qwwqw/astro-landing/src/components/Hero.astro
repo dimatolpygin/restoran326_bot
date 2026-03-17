@@ -1,0 +1,330 @@
+---
+---
+
+<section
+  style="
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    padding: 100px 24px 80px;
+  "
+>
+  <canvas id="wavyCanvas" style="position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%;"></canvas>
+
+  <div style="position: relative; z-index: 2; max-width: 820px; width: 100%;">
+    <!-- Badge -->
+    <div
+      style="
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        color: #A1A1AA;
+        font-size: 13px;
+        margin-bottom: 28px;
+        backdrop-filter: blur(8px);
+      "
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      Новое поколение AI · 2026
+    </div>
+
+    <!-- Headline -->
+    <h1
+      style="
+        font-size: clamp(40px, 6vw, 76px);
+        font-weight: 800;
+        line-height: 1.08;
+        letter-spacing: -2.5px;
+        margin-bottom: 24px;
+        background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      "
+    >
+      Общайся с ИИ.<br />Как никогда раньше.
+    </h1>
+
+    <p
+      style="
+        font-size: 18px;
+        color: #A1A1AA;
+        line-height: 1.6;
+        margin-bottom: 40px;
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
+      "
+    >
+      Мощные языковые модели. Простой интерфейс. Без ограничений.
+    </p>
+
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+      <button
+        class="motion-btn"
+        style="
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 14px 32px;
+          border-radius: 999px;
+          border: none;
+          background: #FFFFFF;
+          color: #0A0A0A;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: transform 0.2s;
+          box-shadow: 0 4px 14px rgba(255,255,255,0.15);
+          font-family: inherit;
+        "
+        onmouseover="this.style.transform='scale(1.03)'"
+        onmouseout="this.style.transform='scale(1)'"
+      >
+        Начать бесплатно
+        <span style="font-size: 18px; transition: transform 0.2s;">→</span>
+      </button>
+      <span style="font-size: 13px; color: #555; letter-spacing: 0.2px;">
+        Кредитная карта не нужна · 50 запросов бесплатно каждый день
+      </span>
+    </div>
+
+    <!-- Chat demo card -->
+    <div
+      style="
+        margin-top: 64px;
+        max-width: 620px;
+        margin-left: auto;
+        margin-right: auto;
+        background: linear-gradient(135deg, #161616, #111111);
+        border: 1px solid #2A2A2A;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 6px 6px 20px rgba(0,0,0,0.7), -2px -2px 8px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06);
+        backdrop-filter: blur(12px);
+        text-align: left;
+      "
+    >
+      <!-- Header -->
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 20px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid #2A2A2A;
+        "
+      >
+        <div
+          style="
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3a3a3a, #222);
+            border: 1px solid #333;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+          "
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size: 14px; font-weight: 600;">NeuralChat</div>
+          <div style="font-size: 11px; color: #555;">Ассистент готов</div>
+        </div>
+        <div
+          style="
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 11px;
+            color: #666;
+          "
+        >
+          <span>GPT-4o</span>
+          <span style="color:#3a3a3a">|</span>
+          <span style="color:#444">Claude 3.5</span>
+          <span style="color:#3a3a3a">|</span>
+          <span style="color:#444">Gemini</span>
+        </div>
+      </div>
+
+      <!-- User message -->
+      <div style="margin-bottom: 14px; display: flex; gap: 10px; flex-direction: row-reverse;">
+        <div
+          style="
+            max-width: 78%;
+            padding: 10px 14px;
+            border-radius: 14px 14px 4px 14px;
+            font-size: 13px;
+            line-height: 1.55;
+            background: #2a2a2a;
+            color: #FFFFFF;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.4), -1px -1px 4px rgba(255,255,255,0.04);
+          "
+        >
+          Объясни квантовые вычисления простыми словами
+        </div>
+      </div>
+
+      <!-- AI message -->
+      <div style="margin-bottom: 14px; display: flex; gap: 10px;">
+        <div
+          style="
+            width: 28px; height: 28px; min-width: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2a2a2a, #161616);
+            border: 1px solid #333;
+            display: flex; align-items: center; justify-content: center;
+          "
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div
+          style="
+            max-width: 78%;
+            padding: 10px 14px;
+            border-radius: 14px 14px 14px 4px;
+            font-size: 13px;
+            line-height: 1.55;
+            background: #161616;
+            color: #A1A1AA;
+            border: 1px solid #2A2A2A;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.4), -1px -1px 4px rgba(255,255,255,0.04);
+          "
+        >
+          Квантовый компьютер — как монета, которая одновременно орёл и решка, пока её не подбросили. Обычный бит — либо 0, либо 1. Кубит может быть обоими сразу, что позволяет перебирать миллионы вариантов параллельно.
+        </div>
+      </div>
+
+      <!-- User message 2 -->
+      <div style="margin-bottom: 14px; display: flex; gap: 10px; flex-direction: row-reverse;">
+        <div
+          style="
+            max-width: 78%;
+            padding: 10px 14px;
+            border-radius: 14px 14px 4px 14px;
+            font-size: 13px;
+            line-height: 1.55;
+            background: #2a2a2a;
+            color: #FFFFFF;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.4), -1px -1px 4px rgba(255,255,255,0.04);
+          "
+        >
+          Теперь переключи на Claude 3.5 и объясни иначе
+        </div>
+      </div>
+
+      <!-- Typing dots -->
+      <div style="display: flex; align-items: center; gap: 5px; margin-top: 8px; padding-left: 38px;">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+
+      <!-- Input bar -->
+      <div
+        style="
+          margin-top: 16px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: #161616;
+          border: 1px solid #2A2A2A;
+          border-radius: 12px;
+          padding: 10px 14px;
+          box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5), inset -1px -1px 4px rgba(255,255,255,0.03);
+        "
+      >
+        <span style="flex: 1; font-size: 13px; color: #444;">Задай вопрос или переключи модель...</span>
+        <div
+          style="
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #333, #222);
+            border: 1px solid #3a3a3a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.4), -1px -1px 3px rgba(255,255,255,0.05);
+          "
+        >↑</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  import { createNoise3D } from 'https://cdn.jsdelivr.net/npm/simplex-noise@4.0.1/+esm';
+
+  const canvas = document.getElementById('wavyCanvas');
+  const ctx = canvas.getContext('2d');
+  const noise3D = createNoise3D();
+
+  const waveColors = [
+    'rgba(255,255,255,0.13)',
+    'rgba(180,180,180,0.10)',
+    'rgba(130,130,130,0.08)',
+    'rgba(85,85,85,0.07)',
+    'rgba(50,50,50,0.05)',
+  ];
+  const backgroundFill = '#0A0A0A';
+  const waveWidth = 50;
+  const blur = 10;
+  const waveOpacity = 0.5;
+  const speed = 0.002;
+
+  let w, h, nt = 0;
+
+  function resize() {
+    const hero = canvas.parentElement;
+    w = canvas.width = hero.offsetWidth;
+    h = canvas.height = hero.offsetHeight;
+    ctx.filter = `blur(${blur}px)`;
+  }
+
+  function drawWave(n) {
+    nt += speed;
+    for (let i = 0; i < n; i++) {
+      ctx.beginPath();
+      ctx.lineWidth = waveWidth;
+      ctx.strokeStyle = waveColors[i % waveColors.length];
+      for (let x = 0; x < w; x += 5) {
+        const y = noise3D(x / 800, 0.3 * i, nt) * 100;
+        ctx.lineTo(x, y + h * 0.5);
+      }
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  function render() {
+    ctx.fillStyle = backgroundFill;
+    ctx.globalAlpha = waveOpacity;
+    ctx.fillRect(0, 0, w, h);
+    drawWave(5);
+    requestAnimationFrame(render);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  render();
+</script>

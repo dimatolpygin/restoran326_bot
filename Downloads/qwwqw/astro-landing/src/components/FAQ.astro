@@ -1,0 +1,138 @@
+---
+const faqs = [
+  {
+    q: 'Как работает доступ к разным моделям?',
+    a: 'На бесплатном тарифе доступны базовые модели: GPT-3.5, Claude Haiku и Gemini Flash. На Pro открываются все 50+ моделей, включая GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, Mistral Large и другие. Переключение происходит прямо в диалоге — одной кнопкой.',
+  },
+  {
+    q: 'Мои диалоги приватны? Они используются для обучения моделей?',
+    a: 'Нет. Твои диалоги не передаются для обучения ни нашим моделям, ни сторонним провайдерам. Все данные зашифрованы в покое (AES-256) и в транзите (TLS 1.3). Ты можешь запросить полное удаление своих данных в любой момент.',
+  },
+  {
+    q: 'Чем отличается Free от Pro?',
+    a: 'Free: 50 запросов в день, доступ к 3 базовым моделям, история за 7 дней. Pro: безлимит, все 50+ моделей включая GPT-4o и Claude 3.5, полная история, приоритетный ответ и файлы до 100 МБ. Переходи на Pro когда упираешься в лимиты Free.',
+  },
+  {
+    q: 'Есть ли мобильное приложение?',
+    a: 'Веб-версия полностью адаптирована для мобильных устройств. Нативные приложения для iOS и Android в разработке — выйдут в Q2 2026. Подпишись на уведомления в телеграм-канале, чтобы не пропустить.',
+  },
+  {
+    q: 'Как работает API?',
+    a: 'API совместим с форматом OpenAI — достаточно сменить base_url и API-ключ. На тарифе Team включено 1M токенов в месяц. Документация доступна в разделе Docs. Поддерживаются стриминг, function calling и vision.',
+  },
+  {
+    q: 'Можно ли отменить подписку?',
+    a: 'Да, в любой момент из настроек аккаунта. Отмена мгновенная, без звонков и объяснений. После отмены Pro остаётся активным до конца оплаченного периода, затем аккаунт переходит на Free.',
+  },
+];
+---
+
+<section
+  style="
+    background: #111111;
+    border-top: 1px solid #2A2A2A;
+    border-bottom: 1px solid #2A2A2A;
+    padding: 96px 24px;
+  "
+>
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div
+      style="
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 16px;
+      "
+    >
+      FAQ
+    </div>
+    <div
+      style="
+        font-size: clamp(28px, 3.5vw, 48px);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+        margin-bottom: 16px;
+        background: linear-gradient(180deg, #FFF 0%, #888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      "
+    >
+      Частые вопросы
+    </div>
+    <p style="font-size: 16px; color: #A1A1AA; max-width: 500px; line-height: 1.6;">
+      Не нашёл ответ? Напиши нам в поддержку.
+    </p>
+
+    <div
+      style="
+        margin-top: 56px;
+        border: 1px solid #2A2A2A;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 6px 6px 20px rgba(0,0,0,0.4), -2px -2px 8px rgba(255,255,255,0.03);
+      "
+    >
+      {
+        faqs.map((faq, i) => (
+          <div
+            class="faq-item"
+            style={`
+              background: #111111;
+              ${i < faqs.length - 1 ? 'border-bottom: 1px solid #2A2A2A;' : ''}
+            `}
+          >
+            <button
+              class="faq-question"
+              style="
+                width: 100%;
+                background: none;
+                border: none;
+                padding: 24px 32px;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                cursor: pointer;
+                font-size: 15px;
+                font-weight: 600;
+                color: #FFFFFF;
+                gap: 16px;
+                font-family: inherit;
+              "
+            >
+              {faq.q}
+              <span class="faq-arrow" style="font-size: 18px; color: #555; flex-shrink: 0;">+</span>
+            </button>
+            <div class="faq-answer">
+              <div
+                style="
+                  padding: 0 32px 24px;
+                  font-size: 14px;
+                  color: #A1A1AA;
+                  line-height: 1.65;
+                "
+              >
+                {faq.a}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.faq-question').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item') as HTMLElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach((el) => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
