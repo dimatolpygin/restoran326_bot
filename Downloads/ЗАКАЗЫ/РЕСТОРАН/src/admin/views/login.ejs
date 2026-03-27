@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход — Склады</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-card { background: #fff; border-radius: 16px; padding: 40px; width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+    h1 { font-size: 22px; margin-bottom: 8px; }
+    p { color: #888; font-size: 14px; margin-bottom: 28px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+    input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 16px; transition: border-color .2s; }
+    input:focus { outline: none; border-color: #4f8ef7; }
+    button { width: 100%; padding: 11px; background: #4f8ef7; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
+    button:hover { background: #3a7ae8; }
+    .error { background: #fff0f0; color: #9b1c1c; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <h1>🏬 Склады</h1>
+    <p>Веб-панель администратора</p>
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+    <form action="/admin/login" method="POST">
+      <label>Логин</label>
+      <input type="text" name="username" placeholder="admin" required autofocus>
+      <label>Пароль</label>
+      <input type="password" name="password" placeholder="••••••••" required>
+      <button type="submit">Войти</button>
+    </form>
+  </div>
+</body>
+</html>
