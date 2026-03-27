@@ -1,5 +1,6 @@
 const expressSession = require('express-session');
-const { RedisStore } = require('connect-redis');
+const connectRedis = require('connect-redis');
+const RedisStore = connectRedis(expressSession);
 const Redis = require('ioredis');
 require('dotenv').config();
 
