@@ -137,7 +137,7 @@ info "Настраиваю Nginx (HTTP, для certbot)..."
 cat > /etc/nginx/sites-available/restaurant-bot <<NGINXEOF
 server {
     listen 80;
-    server_name ${DOMAIN};
+    server_name ${DOMAIN} www.${DOMAIN};
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_set_header Host \$host;
@@ -154,7 +154,7 @@ systemctl reload nginx
 
 # ── SSL ──────────────────────────────────────────────────────────────────────
 info "Получаю SSL-сертификат (certbot)..."
-if certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "$SSL_EMAIL"; then
+if certbot --nginx -d "$DOMAIN" -d "www.${DOMAIN}" --non-interactive --agree-tos --email "$SSL_EMAIL"; then
   info "SSL получен. Применяю финальный конфиг Nginx..."
   # После certbot сертификаты есть — ставим полный конфиг из репо
   sed "s/DOMAIN_PLACEHOLDER/${DOMAIN}/g" nginx/bot.conf > /etc/nginx/sites-available/restaurant-bot
@@ -162,7 +162,7 @@ if certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "$SSL_EMAI
   systemctl reload nginx
 else
   warn "SSL не настроен. Бот работает по HTTP."
-  warn "Запусти вручную: certbot --nginx -d ${DOMAIN} --email ${SSL_EMAIL}"
+  warn "Запусти вручную: certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --email ${SSL_EMAIL}"
 fi
 
 echo ""
