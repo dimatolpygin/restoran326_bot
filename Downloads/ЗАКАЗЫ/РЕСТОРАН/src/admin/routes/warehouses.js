@@ -43,7 +43,13 @@ router.post('/:id/toggle', async (req, res) => {
 
 // Удалить склад
 router.post('/:id/delete', async (req, res) => {
-  const { error } = await supabase.from('warehouses').delete().eq('id', req.params.id);
+  const id = req.params.id;
+  const { error: itemsError } = await supabase.from('items').delete().eq('warehouse_id', id);
+  if (itemsError) {
+    console.error('[warehouses/delete] Failed to delete items:', itemsError);
+    return res.redirect('/admin/warehouses');
+  }
+  const { error } = await supabase.from('warehouses').delete().eq('id', id);
   if (error) console.error('[warehouses/delete] Supabase error:', error);
   res.redirect('/admin/warehouses');
 });
