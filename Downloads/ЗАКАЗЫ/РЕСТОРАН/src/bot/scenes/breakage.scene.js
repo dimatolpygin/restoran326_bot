@@ -6,6 +6,10 @@ const PAGE_SIZE = 8;
 
 const REASONS = ['Скол/трещина', 'Разбито', 'Брак производства', 'Другое'];
 
+function escMd(text) {
+  return String(text ?? '').replace(/[_*`[]/g, '\\$&');
+}
+
 const breakageScene = new Scenes.WizardScene(
   'breakage',
 
@@ -177,9 +181,9 @@ const breakageScene = new Scenes.WizardScene(
     const s = ctx.wizard.state;
     const text =
       `📋 *Подтверждение заявки*\n\n` +
-      `🍽 Товар: ${s.itemName}\n` +
+      `🍽 Товар: ${escMd(s.itemName)}\n` +
       `💥 Количество: ${s.quantity} шт.\n` +
-      `🔩 Причина: ${s.reason}`;
+      `🔩 Причина: ${escMd(s.reason)}`;
 
     await ctx.replyWithPhoto(s.photoFileId, {
       caption: text,
@@ -253,11 +257,11 @@ const breakageScene = new Scenes.WizardScene(
       const groupText =
         `📋 *НОВАЯ ЗАЯВКА НА БОЙ ПОСУДЫ*\n\n` +
         `💥 Бой посуды\n` +
-        `🏬 Склад: ${wh?.name || '—'}\n` +
-        `🍽 Товар: ${s.itemName}\n` +
+        `🏬 Склад: ${escMd(wh?.name || '—')}\n` +
+        `🍽 Товар: ${escMd(s.itemName)}\n` +
         `💥 Количество: ${s.quantity} шт.\n` +
-        `🔩 Причина: ${s.reason}\n` +
-        `👤 Заявитель: ${tgName}${from.username ? ` (@${from.username})` : ''} (ID: ${from.id})\n` +
+        `🔩 Причина: ${escMd(s.reason)}\n` +
+        `👤 Заявитель: ${escMd(tgName)}${from.username ? ` (@${escMd(from.username)})` : ''} (ID: ${from.id})\n` +
         `🔄 Ожидает подтверждения`;
 
       const groupKeyboard = Markup.inlineKeyboard([

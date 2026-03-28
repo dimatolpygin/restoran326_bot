@@ -14,9 +14,17 @@ authScene.enter(async (ctx) => {
 authScene.on('text', async (ctx) => {
   const input = ctx.message.text.trim();
 
-  // Если ждём имя/фамилию от нового пользователя
-  if (ctx.scene.state.waitingName) {
-    const tgName = input;
+  // Шаг: ввод имени
+  if (ctx.scene.state.waitingFirstName) {
+    ctx.scene.state.firstName = input;
+    ctx.scene.state.waitingFirstName = false;
+    ctx.scene.state.waitingLastName = true;
+    return ctx.reply('Введите вашу фамилию:');
+  }
+
+  // Шаг: ввод фамилии
+  if (ctx.scene.state.waitingLastName) {
+    const tgName = [ctx.scene.state.firstName, input].filter(Boolean).join(' ');
     const { tgId, username } = ctx.scene.state;
 
     await supabase.from('bot_users').upsert(
@@ -60,11 +68,11 @@ authScene.on('text', async (ctx) => {
     .single();
 
   if (!existingUser) {
-    // Новый пользователь — запрашиваем имя и фамилию
-    ctx.scene.state.waitingName = true;
+    // Новый пользователь — запрашиваем имя
+    ctx.scene.state.waitingFirstName = true;
     ctx.scene.state.tgId = tgId;
     ctx.scene.state.username = username;
-    return ctx.reply('✅ Пароль верный!\n\nВведите ваше имя и фамилию (например: Иван Иванов):');
+    return ctx.reply('✅ Пароль верный!\n\nВведите ваше имя:');
   }
 
   // Существующий пользователь — обновляем username и активность
