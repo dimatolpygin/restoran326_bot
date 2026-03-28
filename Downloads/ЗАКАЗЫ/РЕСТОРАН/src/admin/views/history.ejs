@@ -1,7 +1,7 @@
 <%- include('_head', { title: 'История заявок', page: 'history' }) %>
 
 <div class="page-header">
-  <h1 class="page-title">📋 История заявок на бой</h1>
+  <h1 class="page-title"><i data-lucide="clipboard-list"></i> История заявок</h1>
 </div>
 
 <!-- Фильтры -->
@@ -82,7 +82,7 @@
         </td>
         <td>
           <% if (r.photo_file_id) { %>
-            <span title="file_id: <%= r.photo_file_id %>">📷</span>
+            <span title="file_id: <%= r.photo_file_id %>"><i data-lucide="image"></i></span>
           <% } %>
         </td>
       </tr>

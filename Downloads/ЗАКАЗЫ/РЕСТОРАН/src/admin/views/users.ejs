@@ -1,7 +1,7 @@
 <%- include('_head', { title: 'Пользователи', page: 'users' }) %>
 
 <div class="page-header">
-  <h1 class="page-title">👥 Пользователи бота</h1>
+  <h1 class="page-title"><i data-lucide="users"></i> Пользователи бота</h1>
 </div>
 
 <div class="card">
@@ -33,7 +33,7 @@
         <td>
           <form action="/admin/users/<%= u.id %>/toggle" method="POST" style="display:inline">
             <button class="btn btn-sm <%= u.is_active ? 'btn-warning' : 'btn-secondary' %>">
-              <%= u.is_active ? '🚫 Заблокировать' : '✅ Разблокировать' %>
+              <% if (u.is_active) { %><i data-lucide="ban"></i> Заблокировать<% } else { %><i data-lucide="check-circle"></i> Разблокировать<% } %>
             </button>
           </form>
         </td>

@@ -1,7 +1,7 @@
 <%- include('_head', { title: 'Склады', page: 'warehouses' }) %>
 
 <div class="page-header">
-  <h1 class="page-title">📦 Склады</h1>
+  <h1 class="page-title"><i data-lucide="warehouse"></i> Склады</h1>
   <button class="btn btn-primary" onclick="openModal('modal-create')">+ Добавить склад</button>
 </div>
 
@@ -28,15 +28,15 @@
         </td>
         <td><%= new Date(w.created_at).toLocaleDateString('ru-RU') %></td>
         <td class="actions">
-          <button class="btn btn-secondary btn-sm" onclick="openModal('modal-rename-<%= w.id %>')">✏️</button>
+          <button class="btn btn-secondary btn-sm" onclick="openModal('modal-rename-<%= w.id %>')"><i data-lucide="pencil"></i></button>
           <form action="/admin/warehouses/<%= w.id %>/toggle" method="POST" style="display:inline">
             <button class="btn btn-secondary btn-sm" title="<%= w.is_active ? 'Деактивировать' : 'Активировать' %>">
-              <%= w.is_active ? '🔕' : '✅' %>
+              <i data-lucide="<%= w.is_active ? 'eye-off' : 'eye' %>"></i>
             </button>
           </form>
           <form action="/admin/warehouses/<%= w.id %>/delete" method="POST" style="display:inline"
                 onsubmit="return confirm('Удалить склад «<%= w.name %>»? Это удалит все позиции!')">
-            <button class="btn btn-danger btn-sm">🗑</button>
+            <button class="btn btn-danger btn-sm"><i data-lucide="trash-2"></i></button>
           </form>
         </td>
       </tr>
