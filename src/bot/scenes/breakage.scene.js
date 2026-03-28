@@ -3,12 +3,141 @@ const supabase = require('../../lib/supabase');
 require('dotenv').config();
 
 const PAGE_SIZE = 8;
+const SEARCH_PAGE_SIZE = 20;
 
 const REASONS = ['Скол/трещина', 'Разбито', 'Брак производства', 'Другое'];
 
 function escMd(text) {
   return String(text ?? '').replace(/[_*`[]/g, '\\$&');
 }
+
+// ── Показать клавиатуру категорий (для /boy) ──────────────────────────
+
+async function showBCategoriesKeyboard(ctx, warehouseId) {
+  const { data: allItems } = await supabase
+    .from('items')
+    .select('category_id, item_categories(id, name, emoji)')
+    .eq('warehouse_id', warehouseId)
+    .eq('is_active', true)
+    .gt('quantity', 0);
+
+  const catMap = new Map();
+  let hasUncategorized = false;
+
+  for (const item of allItems || []) {
+    if (!item.category_id) {
+      hasUncategorized = true;
+    } else if (!catMap.has(item.category_id)) {
+      catMap.set(item.category_id, item.item_categories);
+    }
+  }
+
+  const rows = [];
+  for (const [catId, cat] of catMap) {
+    rows.push([Markup.button.callback(`${cat.emoji} ${cat.name}`, `bcat_${catId}`)]);
+  }
+  if (hasUncategorized) {
+    rows.push([Markup.button.callback('📦 Без категории', 'bcat_0')]);
+  }
+  rows.push([Markup.button.callback('🔍 Поиск по названию', 'bsearch')]);
+  rows.push([Markup.button.callback('❌ Отмена', 'cancel')]);
+
+  const text = '📂 Выберите категорию или воспользуйтесь поиском:';
+
+  try {
+    await ctx.editMessageText(text, Markup.inlineKeyboard(rows));
+  } catch {
+    await ctx.reply(text, Markup.inlineKeyboard(rows));
+  }
+}
+
+// ── Показать страницу позиций ──────────────────────────────────────────
+
+async function showItemsPage(ctx, warehouseId, page, categoryId) {
+  const from = page * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+
+  let query = supabase
+    .from('items')
+    .select('id, name, quantity', { count: 'exact' })
+    .eq('warehouse_id', warehouseId)
+    .eq('is_active', true)
+    .gt('quantity', 0)
+    .order('name')
+    .range(from, to);
+
+  if (categoryId === 0) query = query.is('category_id', null);
+  else if (categoryId != null) query = query.eq('category_id', categoryId);
+
+  const { data: items, count } = await query;
+
+  const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
+
+  const rows = (items || []).map((item) => [
+    Markup.button.callback(`${item.name} (${item.quantity} шт.)`, `bitem_${item.id}`),
+  ]);
+
+  const nav = [];
+  if (page > 0) nav.push(Markup.button.callback('◀️', `bitems_page_${page - 1}`));
+  if (page < totalPages - 1) nav.push(Markup.button.callback('▶️', `bitems_page_${page + 1}`));
+  if (nav.length) rows.push(nav);
+  rows.push([Markup.button.callback('◀️ К категориям', 'back_to_cats')]);
+  rows.push([Markup.button.callback('❌ Отмена', 'cancel')]);
+
+  const text = `🍽 Выберите товар (стр. ${page + 1}/${totalPages || 1}):`;
+
+  try {
+    await ctx.editMessageText(text, Markup.inlineKeyboard(rows));
+  } catch {
+    await ctx.reply(text, Markup.inlineKeyboard(rows));
+  }
+}
+
+// ── Показать результаты поиска ─────────────────────────────────────────
+
+async function showSearchResults(ctx, warehouseId, searchQuery, page = 0) {
+  const from = page * SEARCH_PAGE_SIZE;
+  const to = from + SEARCH_PAGE_SIZE - 1;
+
+  const { data: items, count } = await supabase
+    .from('items')
+    .select('id, name, quantity', { count: 'exact' })
+    .eq('warehouse_id', warehouseId)
+    .eq('is_active', true)
+    .gt('quantity', 0)
+    .ilike('name', `%${searchQuery}%`)
+    .order('name')
+    .range(from, to);
+
+  if (!items || items.length === 0) {
+    const rows = [
+      [Markup.button.callback('◀️ К категориям', 'back_to_cats')],
+      [Markup.button.callback('❌ Отмена', 'cancel')],
+    ];
+    await ctx.reply(`❌ Ничего не найдено по запросу «${escMd(searchQuery)}». Попробуйте снова или выберите категорию.`, {
+      parse_mode: 'Markdown',
+      ...Markup.inlineKeyboard(rows),
+    });
+    return;
+  }
+
+  const totalPages = Math.ceil(count / SEARCH_PAGE_SIZE);
+  const rows = items.map((item) => [
+    Markup.button.callback(`${item.name} (${item.quantity} шт.)`, `bitem_${item.id}`),
+  ]);
+
+  const nav = [];
+  if (page > 0) nav.push(Markup.button.callback('◀️', `bsearch_page_${page - 1}`));
+  if (page < totalPages - 1) nav.push(Markup.button.callback('▶️', `bsearch_page_${page + 1}`));
+  if (nav.length) rows.push(nav);
+  rows.push([Markup.button.callback('◀️ К категориям', 'back_to_cats')]);
+  rows.push([Markup.button.callback('❌ Отмена', 'cancel')]);
+
+  const text = `🔍 Результаты по «${searchQuery}» (стр. ${page + 1}/${totalPages}):`;
+  await ctx.reply(text, Markup.inlineKeyboard(rows));
+}
+
+// ── Сцена ─────────────────────────────────────────────────────────────
 
 const breakageScene = new Scenes.WizardScene(
   'breakage',
@@ -37,9 +166,9 @@ const breakageScene = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
 
-  // ── Шаг 2: Выбор товара (пагинация) ──────────────────────────────
+  // ── Шаг 2: Выбор склада → показываем категории ───────────────────
   async (ctx) => {
-    if (!ctx.callbackQuery) return; // ждём нажатия кнопки
+    if (!ctx.callbackQuery) return;
     await ctx.answerCbQuery();
 
     const data = ctx.callbackQuery.data;
@@ -52,14 +181,22 @@ const breakageScene = new Scenes.WizardScene(
     if (data.startsWith('bwh_')) {
       const wId = parseInt(data.replace('bwh_', ''));
       ctx.wizard.state.warehouseId = wId;
-      ctx.wizard.state.itemPage = 0;
-      await showItemsPage(ctx, wId, 0);
+      await showBCategoriesKeyboard(ctx, wId);
       return ctx.wizard.next();
     }
   },
 
-  // ── Шаг 3: Пагинация товаров / выбор товара ───────────────────────
+  // ── Шаг 3: Выбор категории / поиск / выбор товара ────────────────
   async (ctx) => {
+    // Режим поиска: ждём текстовое сообщение
+    if (ctx.wizard.state.searchMode && ctx.message?.text) {
+      ctx.wizard.state.searchMode = false;
+      const query = ctx.message.text.trim();
+      ctx.wizard.state.lastSearch = query;
+      await showSearchResults(ctx, ctx.wizard.state.warehouseId, query);
+      return;
+    }
+
     if (!ctx.callbackQuery) return;
     await ctx.answerCbQuery();
 
@@ -70,11 +207,37 @@ const breakageScene = new Scenes.WizardScene(
       return ctx.scene.leave();
     }
 
+    if (data === 'back_to_cats') {
+      await showBCategoriesKeyboard(ctx, ctx.wizard.state.warehouseId);
+      return;
+    }
+
+    if (data.startsWith('bcat_')) {
+      const catRaw = data.replace('bcat_', '');
+      const catId = catRaw === '0' ? 0 : parseInt(catRaw);
+      ctx.wizard.state.categoryId = catId;
+      ctx.wizard.state.itemPage = 0;
+      await showItemsPage(ctx, ctx.wizard.state.warehouseId, 0, catId);
+      return;
+    }
+
+    if (data === 'bsearch') {
+      ctx.wizard.state.searchMode = true;
+      await ctx.reply('🔍 Введите название позиции:');
+      return;
+    }
+
     if (data.startsWith('bitems_page_')) {
       const page = parseInt(data.replace('bitems_page_', ''));
       ctx.wizard.state.itemPage = page;
-      await showItemsPage(ctx, ctx.wizard.state.warehouseId, page);
-      return; // остаёмся на этом шаге
+      await showItemsPage(ctx, ctx.wizard.state.warehouseId, page, ctx.wizard.state.categoryId);
+      return;
+    }
+
+    if (data.startsWith('bsearch_page_')) {
+      const page = parseInt(data.replace('bsearch_page_', ''));
+      await showSearchResults(ctx, ctx.wizard.state.warehouseId, ctx.wizard.state.lastSearch, page);
+      return;
     }
 
     if (data.startsWith('bitem_')) {
@@ -292,41 +455,5 @@ const breakageScene = new Scenes.WizardScene(
     }
   }
 );
-
-// ── Вспомогательная функция пагинации ─────────────────────────────────
-
-async function showItemsPage(ctx, warehouseId, page) {
-  const from = page * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
-
-  const { data: items, count } = await supabase
-    .from('items')
-    .select('id, name, quantity', { count: 'exact' })
-    .eq('warehouse_id', warehouseId)
-    .eq('is_active', true)
-    .gt('quantity', 0)
-    .order('name')
-    .range(from, to);
-
-  const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
-
-  const rows = (items || []).map((item) => [
-    Markup.button.callback(`${item.name} (${item.quantity} шт.)`, `bitem_${item.id}`),
-  ]);
-
-  const nav = [];
-  if (page > 0) nav.push(Markup.button.callback('◀️', `bitems_page_${page - 1}`));
-  if (page < totalPages - 1) nav.push(Markup.button.callback('▶️', `bitems_page_${page + 1}`));
-  if (nav.length) rows.push(nav);
-  rows.push([Markup.button.callback('❌ Отмена', 'cancel')]);
-
-  const text = `🍽 Выберите товар (стр. ${page + 1}/${totalPages || 1}):`;
-
-  try {
-    await ctx.editMessageText(text, Markup.inlineKeyboard(rows));
-  } catch {
-    await ctx.reply(text, Markup.inlineKeyboard(rows));
-  }
-}
 
 module.exports = breakageScene;

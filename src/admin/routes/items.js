@@ -19,31 +19,36 @@ const upload = multer({
 
 // Список позиций
 router.get('/', async (req, res) => {
-  const { warehouse } = req.query;
+  const { warehouse, category } = req.query;
 
   let query = supabase
     .from('items')
-    .select('*, warehouses(name)')
+    .select('*, warehouses(name), item_categories(name, emoji)')
     .order('name');
 
   if (warehouse) query = query.eq('warehouse_id', warehouse);
+  if (category === '0') query = query.is('category_id', null);
+  else if (category) query = query.eq('category_id', category);
 
-  const [{ data: items }, { data: warehouses }] = await Promise.all([
+  const [{ data: items }, { data: warehouses }, { data: categories }] = await Promise.all([
     query,
     supabase.from('warehouses').select('id, name').eq('is_active', true).order('name'),
+    supabase.from('item_categories').select('id, name, emoji').order('name'),
   ]);
 
   res.render('items', {
     items,
     warehouses,
+    categories,
     selectedWarehouse: warehouse || '',
+    selectedCategory: category || '',
     user: req.session.adminUser,
   });
 });
 
 // Создать позицию
 router.post('/create', upload.single('photo'), async (req, res) => {
-  const { name, warehouse_id, price, quantity } = req.body;
+  const { name, warehouse_id, price, quantity, category_id } = req.body;
   let photo_file_id = null;
 
   if (req.file) {
@@ -56,6 +61,7 @@ router.post('/create', upload.single('photo'), async (req, res) => {
     price: price ? parseFloat(price) : null,
     quantity: parseInt(quantity) || 0,
     photo_file_id,
+    category_id: category_id ? parseInt(category_id) : null,
   });
 
   res.redirect('/admin/items');
@@ -63,11 +69,12 @@ router.post('/create', upload.single('photo'), async (req, res) => {
 
 // Редактировать позицию
 router.post('/:id/edit', upload.single('photo'), async (req, res) => {
-  const { name, price, quantity } = req.body;
+  const { name, price, quantity, category_id } = req.body;
   const updates = {
     name: name.trim(),
     price: price ? parseFloat(price) : null,
     quantity: parseInt(quantity) || 0,
+    category_id: category_id ? parseInt(category_id) : null,
     updated_at: new Date().toISOString(),
   };
 

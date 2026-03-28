@@ -22,6 +22,7 @@ function createAdminServer() {
   app.use('/admin/history', require('./routes/history'));
   app.use('/admin/users', require('./routes/users'));
   app.use('/admin/settings', require('./routes/settings'));
+  app.use('/admin/categories', require('./routes/categories'));
 
   // Редирект корня
   app.get('/', (req, res) => res.redirect('/admin/warehouses'));
