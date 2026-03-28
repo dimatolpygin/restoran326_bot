@@ -35,7 +35,7 @@
             </button>
           </form>
           <form action="/admin/warehouses/<%= w.id %>/delete" method="POST" style="display:inline"
-                onsubmit="return confirm('Удалить склад «<%= w.name %>»? Это удалит все позиции!')">
+                onsubmit="return confirm(`Удалить склад «<%= w.name %>»? Это удалит все позиции!`)">
             <button class="btn btn-danger btn-sm"><i data-lucide="trash-2"></i></button>
           </form>
         </td>

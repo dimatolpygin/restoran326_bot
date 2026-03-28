@@ -43,7 +43,8 @@ router.post('/:id/toggle', async (req, res) => {
 
 // Удалить склад
 router.post('/:id/delete', async (req, res) => {
-  await supabase.from('warehouses').delete().eq('id', req.params.id);
+  const { error } = await supabase.from('warehouses').delete().eq('id', req.params.id);
+  if (error) console.error('[warehouses/delete] Supabase error:', error);
   res.redirect('/admin/warehouses');
 });
 
