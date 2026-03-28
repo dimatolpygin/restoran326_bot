@@ -17,6 +17,16 @@
         <% }) %>
       </select>
     </div>
+    <div class="form-group">
+      <label>Категория</label>
+      <select class="form-control" name="category">
+        <option value="">Все категории</option>
+        <option value="0" <%= selectedCategory === '0' ? 'selected' : '' %>>📦 Без категории</option>
+        <% categories.forEach(function(c) { %>
+          <option value="<%= c.id %>" <%= selectedCategory == c.id ? 'selected' : '' %>><%= c.emoji %> <%= c.name %></option>
+        <% }) %>
+      </select>
+    </div>
     <div style="align-self:flex-end">
       <button type="submit" class="btn btn-secondary">Применить</button>
     </div>
@@ -30,6 +40,7 @@
         <th>Фото</th>
         <th>Название</th>
         <th>Склад</th>
+        <th>Категория</th>
         <th>Цена</th>
         <th>Остаток</th>
         <th>Статус</th>
@@ -48,6 +59,13 @@
         </td>
         <td><strong><%= item.name %></strong></td>
         <td><%= item.warehouses ? item.warehouses.name : '—' %></td>
+        <td>
+          <% if (item.item_categories) { %>
+            <%= item.item_categories.emoji %> <%= item.item_categories.name %>
+          <% } else { %>
+            <span style="color:#aaa">—</span>
+          <% } %>
+        </td>
         <td><%= item.price != null ? item.price + ' ₽' : '—' %></td>
         <td><strong><%= item.quantity %></strong> шт.</td>
         <td>
@@ -82,6 +100,15 @@
       <div class="form-group">
         <label>Название</label>
         <input class="form-control" name="name" value="<%= item.name %>" required>
+      </div>
+      <div class="form-group">
+        <label>Категория</label>
+        <select class="form-control" name="category_id">
+          <option value="">Без категории</option>
+          <% categories.forEach(function(c) { %>
+            <option value="<%= c.id %>" <%= item.category_id == c.id ? 'selected' : '' %>><%= c.emoji %> <%= c.name %></option>
+          <% }) %>
+        </select>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -121,6 +148,15 @@
           <option value="">Выберите склад</option>
           <% warehouses.forEach(function(w) { %>
             <option value="<%= w.id %>"><%= w.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Категория</label>
+        <select class="form-control" name="category_id">
+          <option value="">Без категории</option>
+          <% categories.forEach(function(c) { %>
+            <option value="<%= c.id %>"><%= c.emoji %> <%= c.name %></option>
           <% }) %>
         </select>
       </div>
