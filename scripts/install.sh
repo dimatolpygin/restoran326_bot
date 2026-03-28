@@ -26,7 +26,8 @@ prompt "SUPABASE_URL (https://xxx.supabase.co)" SUPABASE_URL
 prompt "SUPABASE_KEY (anon/service key)" SUPABASE_KEY
 prompt "REDIS_URL (оставь пустым для redis://localhost:6379)" REDIS_URL
 REDIS_URL=${REDIS_URL:-redis://localhost:6379}
-prompt "Домен для Nginx (напр. bot.example.com)" DOMAIN
+prompt "Домен для Nginx (напр. anastasia-kwork.store, без www)" DOMAIN
+DOMAIN="${DOMAIN#www.}"  # убираем www. если вдруг ввели
 prompt "Email для SSL-сертификата" SSL_EMAIL
 prompt "Логин для веб-adminки" ADMIN_LOGIN
 promptp "Пароль для веб-adminки" ADMIN_PASS
