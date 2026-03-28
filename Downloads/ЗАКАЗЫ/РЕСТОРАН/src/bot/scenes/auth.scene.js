@@ -63,7 +63,7 @@ authScene.on('text', async (ctx) => {
   // Проверяем, существует ли пользователь
   const { data: existingUser } = await supabase
     .from('bot_users')
-    .select('tg_id')
+    .select('tg_id, is_active')
     .eq('tg_id', tgId)
     .single();
 
@@ -75,15 +75,15 @@ authScene.on('text', async (ctx) => {
     return ctx.reply('✅ Пароль верный!\n\nВведите ваше имя:');
   }
 
-  // Существующий пользователь — обновляем username и активность
-  await supabase.from('bot_users').upsert(
-    {
-      tg_id: tgId,
-      tg_username: username || null,
-      is_active: true,
-    },
-    { onConflict: 'tg_id' }
-  );
+  // Заблокированный пользователь — отказываем
+  if (!existingUser.is_active) {
+    return ctx.reply('🚫 Ваш аккаунт заблокирован. Обратитесь к администратору.');
+  }
+
+  // Существующий активный пользователь — обновляем только username
+  await supabase.from('bot_users')
+    .update({ tg_username: username || null })
+    .eq('tg_id', tgId);
 
   await ctx.reply('✅ Авторизация успешна!');
   await ctx.scene.leave();
