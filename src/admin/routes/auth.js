@@ -28,8 +28,10 @@ router.post('/login', async (req, res) => {
   }
 
   req.session.adminUser = { id: user.id, username: user.username };
+  console.log('[auth/login] Saving session id:', req.sessionID, '| adminUser set:', req.session.adminUser);
   req.session.save((err) => {
     if (err) console.error('[auth/login] Session save error:', err);
+    else console.log('[auth/login] Session saved OK, redirecting');
     return res.redirect('/admin/warehouses');
   });
 });

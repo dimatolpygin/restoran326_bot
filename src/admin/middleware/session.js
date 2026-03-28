@@ -23,6 +23,7 @@ function setupSession(app) {
 }
 
 function requireAuth(req, res, next) {
+  console.log('[requireAuth] session id:', req.sessionID, '| adminUser:', req.session?.adminUser, '| protocol:', req.protocol, '| secure:', req.secure);
   if (req.session?.adminUser) return next();
   return res.redirect('/admin/login');
 }
