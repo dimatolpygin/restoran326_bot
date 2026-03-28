@@ -105,7 +105,22 @@ router.post('/:id/toggle', async (req, res) => {
 
 // Удалить позицию
 router.post('/:id/delete', async (req, res) => {
-  await supabase.from('items').delete().eq('id', req.params.id);
+  const id = req.params.id;
+
+  // Сначала удаляем связанные заявки (FK constraint)
+  const { error: brError } = await supabase
+    .from('breakage_requests')
+    .delete()
+    .eq('item_id', id);
+  if (brError) {
+    console.error('[items/delete] Failed to delete breakage_requests:', brError);
+    return res.redirect('/admin/items');
+  }
+
+  // Потом удаляем саму позицию
+  const { error } = await supabase.from('items').delete().eq('id', id);
+  if (error) console.error('[items/delete] Supabase error:', error);
+
   res.redirect('/admin/items');
 });
 
