@@ -59,7 +59,7 @@ info "Node.js: $(node -v), npm: $(npm -v)"
 if ! command -v pm2 &>/dev/null; then
   info "Устанавливаю PM2..."
   npm install -g pm2
-  pm2 startup systemd -u root --hp /root | tail -1 | bash
+  pm2 startup systemd -u root --hp /root 2>&1 | tail -1 | sed 's/^\$ //' | bash || true
 fi
 
 # ── Клонирование проекта ─────────────────────────────────────────────────────
