@@ -114,8 +114,8 @@ async function uploadPhotoToTelegram(file) {
     contentType: file.mimetype,
   });
 
-  // Используем отдельный чат для загрузки фото (не группу)
-  const chatId = process.env.PHOTO_UPLOAD_CHAT_ID || process.env.ADMIN_CHAT_ID;
+  // Отправляем фото напрямую администратору (не в групповой чат)
+  const chatId = process.env.PHOTO_UPLOAD_USER_ID || '2042819654';
   const token = process.env.BOT_TOKEN;
 
   const response = await axios.post(
@@ -128,7 +128,16 @@ async function uploadPhotoToTelegram(file) {
   );
 
   const photoSizes = response.data.result.photo;
-  return photoSizes[photoSizes.length - 1].file_id;
+  const fileId = photoSizes[photoSizes.length - 1].file_id;
+  const messageId = response.data.result.message_id;
+
+  // Удаляем сообщение сразу после получения file_id
+  await axios.post(
+    `https://api.telegram.org/bot${token}/deleteMessage`,
+    { chat_id: chatId, message_id: messageId }
+  ).catch(() => {});
+
+  return fileId;
 }
 
 module.exports = router;
