@@ -62,13 +62,20 @@
     @media (max-width: 768px) {
       .sidebar { position: relative; width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; padding: 8px; gap: 4px; }
       .sidebar-logo { display: none; }
-      .sidebar-footer { margin-top: 0; padding: 8px; border-top: none; }
-      .nav-item { padding: 6px 10px; font-size: 12px; border-radius: 6px; border-left: none; }
+      .sidebar-footer { margin-top: 0; padding: 4px 8px; border-top: none; }
+      .nav-item { padding: 6px 10px; font-size: 12px; border-radius: 6px; border-left: none; flex: 0 0 auto; }
       .nav-item.active { border-left: none; border-bottom: 2px solid #6366f1; }
       .main { margin-left: 0; padding: 12px; }
       .page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-      table { display: block; overflow-x: auto; min-width: 600px; }
+      /* FIX 1: card — scroll-контейнер для таблиц */
+      .card { overflow-x: auto; }
+      /* FIX 1: table без display:block — нормальный рендеринг + min-width */
+      table { min-width: 600px; }
+      /* FIX 3: нет переноса текста → строки одинаковой высоты */
+      td, th { white-space: nowrap; padding: 8px 10px; }
+      /* FIX 2: кнопка фильтра на всю ширину */
       .form-row { flex-direction: column; }
+      .form-row > * { width: 100%; align-self: stretch; }
       .modal { width: 95vw; padding: 16px; }
     }
   </style>
