@@ -46,6 +46,16 @@ function createBot() {
     await ctx.scene.enter('breakage');
   });
 
+  bot.command('admin', async (ctx) => {
+    await ctx.reply('Панель управления:', {
+      reply_markup: {
+        inline_keyboard: [[
+          { text: '⚙️ Открыть админку', web_app: { url: 'https://anastasia-kwork.store/' } }
+        ]]
+      }
+    });
+  });
+
   // ── Callbacks из группы (accept/reject) ─────────────────────────
   setupBreakageCallbacks(bot);
 
