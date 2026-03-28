@@ -1,0 +1,33 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -e
+            cd /var/www/restaurant-bot
+
+            echo "==> Pulling latest code..."
+            git pull origin master
+
+            echo "==> Installing dependencies..."
+            npm ci --only=production
+
+            echo "==> Restarting PM2..."
+            pm2 restart restaurant-bot --update-env
+
+            echo "==> Done!"
+            pm2 status restaurant-bot
