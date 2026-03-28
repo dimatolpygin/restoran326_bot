@@ -127,6 +127,15 @@ const breakageScene = new Scenes.WizardScene(
 
   // ── Шаг 5: Причина ───────────────────────────────────────────────
   async (ctx) => {
+    // Ввод произвольной причины (после выбора "Другое")
+    if (ctx.wizard.state.waitingCustomReason) {
+      if (!ctx.message?.text) return;
+      ctx.wizard.state.reason = ctx.message.text.trim();
+      ctx.wizard.state.waitingCustomReason = false;
+      await ctx.reply('📸 Прикрепите фото повреждения:');
+      return ctx.wizard.next();
+    }
+
     if (!ctx.callbackQuery) return;
     await ctx.answerCbQuery();
 
@@ -138,7 +147,13 @@ const breakageScene = new Scenes.WizardScene(
     }
 
     if (data.startsWith('reason_')) {
-      ctx.wizard.state.reason = data.replace('reason_', '');
+      const reason = data.replace('reason_', '');
+      if (reason === 'Другое') {
+        ctx.wizard.state.waitingCustomReason = true;
+        await ctx.reply('✏️ Введите причину:');
+        return; // остаёмся на шаге 5
+      }
+      ctx.wizard.state.reason = reason;
       await ctx.reply('📸 Прикрепите фото повреждения:');
       return ctx.wizard.next();
     }
@@ -195,7 +210,14 @@ const breakageScene = new Scenes.WizardScene(
     if (data === 'confirm') {
       const s = ctx.wizard.state;
       const { from } = ctx;
-      const tgName = [from.first_name, from.last_name].filter(Boolean).join(' ');
+
+      // Берём имя из БД, чтобы использовать введённое при регистрации
+      const { data: botUser } = await supabase
+        .from('bot_users')
+        .select('tg_name')
+        .eq('tg_id', from.id)
+        .single();
+      const tgName = botUser?.tg_name || [from.first_name, from.last_name].filter(Boolean).join(' ');
 
       // Сохраняем заявку
       const { data: req, error } = await supabase

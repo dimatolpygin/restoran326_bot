@@ -139,13 +139,24 @@ async function showItemsPage(ctx, warehouseId, page) {
 
   const totalPages = Math.ceil(count / PAGE_SIZE);
 
-  await ctx.editMessageText(
-    `🏬 *${wh?.name || 'Склад'}*\nСтраница ${page + 1}/${totalPages}`,
-    {
-      parse_mode: 'Markdown',
-      ...itemsKeyboard(items, page, totalPages, warehouseId),
-    }
-  );
+  try {
+    await ctx.editMessageText(
+      `🏬 *${wh?.name || 'Склад'}*\nСтраница ${page + 1}/${totalPages}`,
+      {
+        parse_mode: 'Markdown',
+        ...itemsKeyboard(items, page, totalPages, warehouseId),
+      }
+    );
+  } catch {
+    try { await ctx.deleteMessage(); } catch {}
+    await ctx.reply(
+      `🏬 *${wh?.name || 'Склад'}*\nСтраница ${page + 1}/${totalPages}`,
+      {
+        parse_mode: 'Markdown',
+        ...itemsKeyboard(items, page, totalPages, warehouseId),
+      }
+    );
+  }
 }
 
 module.exports = catalogWarehouseScene;

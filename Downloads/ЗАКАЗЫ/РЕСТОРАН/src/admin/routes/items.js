@@ -114,8 +114,8 @@ async function uploadPhotoToTelegram(file) {
     contentType: file.mimetype,
   });
 
-  // Используем служебный чат (admin chat) для хранения фото
-  const chatId = process.env.ADMIN_CHAT_ID;
+  // Используем отдельный чат для загрузки фото (не группу)
+  const chatId = process.env.PHOTO_UPLOAD_CHAT_ID || process.env.ADMIN_CHAT_ID;
   const token = process.env.BOT_TOKEN;
 
   const response = await axios.post(
