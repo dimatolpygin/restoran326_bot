@@ -43,7 +43,10 @@ export async function callModel(
   // thinking_budget: 0 only for models that support thinking
   const THINKING_MODELS = ['gemini-2.5-flash-preview-04-17']
   if (THINKING_MODELS.includes(model)) {
-    body.extra_body = { thinking_budget: 0 }
+    body.extra_body = {
+      thinking_budget: 0,
+      ...(opts.response_format?.type === 'json_object' ? { response_mime_type: 'application/json' } : {}),
+    }
   }
 
   const res = await fetch(`${COMETAPI_BASE}/chat/completions`, {

@@ -80,13 +80,12 @@ export async function POST(req: Request) {
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
-      { max_tokens: 4000 }
+      { max_tokens: 16000, response_format: { type: 'json_object' } }
     )
 
     console.log('[plans] raw AI response:', response.slice(0, 500))
-    const jsonMatch = response.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) throw new Error(`No JSON in response. Raw: ${response.slice(0, 200)}`)
-    const parsed = JSON.parse(jsonMatch[0])
+    const cleaned = response.replace(/^```json\s*/i, '').replace(/\s*```$/, '').trim()
+    const parsed = JSON.parse(cleaned)
     slots = parsed.slots ?? []
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
