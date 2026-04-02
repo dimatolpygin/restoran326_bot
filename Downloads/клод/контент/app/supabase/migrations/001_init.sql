@@ -86,3 +86,9 @@ DROP TRIGGER IF EXISTS content_plans_updated_at ON content_plans;
 CREATE TRIGGER content_plans_updated_at
   BEFORE UPDATE ON content_plans
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Disable RLS — single-user local app, anon key is sufficient
+ALTER TABLE projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE content_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE rubrics DISABLE ROW LEVEL SECURITY;
+ALTER TABLE content_slots DISABLE ROW LEVEL SECURITY;
