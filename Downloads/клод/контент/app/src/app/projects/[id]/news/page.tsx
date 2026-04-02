@@ -249,6 +249,26 @@ export default function NewsPage() {
                 Добавьте Twitter-аккаунт или Telegram-канал в панели слева
               </p>
             </div>
+          ) : !loadingFeed && Object.keys(sourceErrors).length > 0 && items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <AlertTriangle size={32} className="text-[#f59e0b] mb-3" />
+              <p className="text-[#e5e5e5] text-sm font-medium">Источники недоступны</p>
+              <p className="text-[#737373] text-xs mt-1 max-w-xs">
+                RSSHub не может подключиться к Telegram/Twitter. Проверьте сеть контейнера RSSHub.
+              </p>
+              <div className="mt-3 flex flex-col gap-1 text-left">
+                {Object.entries(sourceErrors).map(([sid, err]) => {
+                  const s = sources.find((x) => x.id === sid)
+                  return (
+                    <p key={sid} className="text-[#555] text-xs">
+                      <span className="text-[#737373]">@{s?.handle ?? sid.slice(0, 8)}</span>
+                      {' — '}
+                      <span className="text-[#f59e0b]">{err}</span>
+                    </p>
+                  )
+                })}
+              </div>
+            </div>
           ) : loadingFeed ? (
             <div className="flex flex-col gap-3">
               {[...Array(5)].map((_, i) => (
