@@ -75,7 +75,7 @@ export async function POST(req: Request) {
 
   try {
     const response = await callModel(
-      'gemini-2.5-flash-lite',
+      'gemini-2.5-flash-preview-04-17',
       [
         { role: 'system', content: system },
         { role: 'user', content: user },
@@ -102,24 +102,36 @@ export async function POST(req: Request) {
   rubrics!.forEach((r: { id: string; name: string }) => rubricMap.set(r.name, r.id))
 
   // Insert slots
-  const slotRows = slots.map((s) => ({
-    plan_id: plan.id,
-    rubric_id: rubricMap.get(s.rubric) ?? null,
-    date: s.date,
-    platform: s.platform,
-    format: s.format ?? 'пост',
-    topic: s.topic,
-    hook: s.hook,
-    cta: s.cta,
-    status: 'idea',
-  }))
+  const VALID_PLATFORMS = ['telegram', 'vk', 'instagram', 'x', 'youtube']
+  const slotRows = slots
+    .filter((s) => VALID_PLATFORMS.includes(s.platform))
+    .map((s) => ({
+      plan_id: plan.id,
+      rubric_id: rubricMap.get(s.rubric) ?? null,
+      date: s.date,
+      platform: s.platform,
+      format: s.format ?? 'пост',
+      topic: s.topic,
+      hook: s.hook,
+      cta: s.cta,
+      status: 'idea',
+    }))
+
+  console.log(`[plans] inserting ${slotRows.length} slots (AI returned ${slots.length})`)
+
+  if (slotRows.length === 0) {
+    return NextResponse.json({ plan, slots: [], rubrics }, { status: 201 })
+  }
 
   const { data: insertedSlots, error: slotsError } = await supabase
     .from('content_slots')
     .insert(slotRows)
     .select()
 
-  if (slotsError) return NextResponse.json({ error: slotsError.message }, { status: 500 })
+  if (slotsError) {
+    console.error('[plans] slotsError:', JSON.stringify(slotsError))
+    return NextResponse.json({ error: slotsError.message }, { status: 500 })
+  }
 
   return NextResponse.json({ plan, slots: insertedSlots, rubrics }, { status: 201 })
 }

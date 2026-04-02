@@ -69,7 +69,10 @@ export default function NewProjectPage() {
         }),
       })
 
-      if (!planRes.ok) throw new Error('Failed to generate plan')
+      if (!planRes.ok) {
+        const errBody = await planRes.json().catch(() => ({}))
+        throw new Error((errBody as { error?: string }).error ?? 'Failed to generate plan')
+      }
       const { plan } = await planRes.json()
 
       router.push(`/projects/${project.id}?plan=${plan.id}`)
