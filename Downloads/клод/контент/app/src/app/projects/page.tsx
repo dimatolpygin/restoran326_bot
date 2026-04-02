@@ -2,14 +2,14 @@ import Link from 'next/link'
 import { createServerClient } from '@/lib/supabase'
 import { Project, PLATFORM_LABELS, Platform } from '@/lib/types'
 import { Button } from '@/components/ui/Button'
-import { Send, Users, Camera, Twitter, Youtube, Plus, FolderOpen } from 'lucide-react'
+import { Send, Users, Camera, X as XIcon, Video, Plus, FolderOpen } from 'lucide-react'
 
 const platformIcons: Record<Platform, React.ElementType> = {
   telegram: Send,
   vk: Users,
   instagram: Camera,
-  x: Twitter,
-  youtube: Youtube,
+  x: XIcon,
+  youtube: Video,
 }
 
 async function getProjects(): Promise<Project[]> {

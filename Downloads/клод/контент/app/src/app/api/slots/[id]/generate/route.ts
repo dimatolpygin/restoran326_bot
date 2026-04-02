@@ -37,7 +37,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   // Web search for post context
   let webContext = ''
-  let sources = []
+  let sources: { title: string; url: string }[] = []
 
   if (useWebSearch && process.env.USE_WEB_SEARCH === 'true' && slot.topic) {
     try {

@@ -7,15 +7,15 @@ import { CalendarView } from '@/components/calendar/CalendarView'
 import { SlotDrawer } from '@/components/slot/SlotDrawer'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
-import { ChevronLeft, Flame, Plus, Send, Users, Camera, Twitter, Youtube } from 'lucide-react'
+import { ChevronLeft, Flame, Plus, Send, Users, Camera, X as XIcon, Video } from 'lucide-react'
 import Link from 'next/link'
 
 const platformIcons: Record<Platform, React.ElementType> = {
   telegram: Send,
   vk: Users,
   instagram: Camera,
-  x: Twitter,
-  youtube: Youtube,
+  x: XIcon,
+  youtube: Video,
 }
 
 interface Props {

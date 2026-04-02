@@ -3,14 +3,14 @@
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Platform, PLATFORM_LABELS } from '@/lib/types'
-import { Send, Users, Camera, Twitter, Youtube } from 'lucide-react'
+import { Send, Users, Camera, X as XIcon, Video } from 'lucide-react'
 
 const PLATFORMS: { value: Platform; icon: React.ElementType }[] = [
   { value: 'telegram', icon: Send },
   { value: 'vk', icon: Users },
   { value: 'instagram', icon: Camera },
-  { value: 'x', icon: Twitter },
-  { value: 'youtube', icon: Youtube },
+  { value: 'x', icon: XIcon },
+  { value: 'youtube', icon: Video },
 ]
 
 interface Step2Data {

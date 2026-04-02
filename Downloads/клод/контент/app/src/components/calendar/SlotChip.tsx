@@ -1,14 +1,14 @@
 'use client'
 
 import { ContentSlot, SlotStatus } from '@/lib/types'
-import { Send, Users, Camera, Twitter, Youtube } from 'lucide-react'
+import { Send, Users, Camera, X as XIcon, Video } from 'lucide-react'
 
 const platformIcons = {
   telegram: Send,
   vk: Users,
   instagram: Camera,
-  x: Twitter,
-  youtube: Youtube,
+  x: XIcon,
+  youtube: Video,
 }
 
 const statusBorder: Record<SlotStatus, string> = {
