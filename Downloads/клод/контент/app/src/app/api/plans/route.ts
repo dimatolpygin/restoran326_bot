@@ -80,13 +80,17 @@ export async function POST(req: Request) {
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
-      { response_format: { type: 'json_object' }, max_tokens: 4000 }
+      { max_tokens: 4000 }
     )
 
-    const parsed = JSON.parse(response)
+    // Strip markdown code fences if model wrapped the JSON
+    const cleaned = response.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
+    const parsed = JSON.parse(cleaned)
     slots = parsed.slots ?? []
   } catch (e) {
-    return NextResponse.json({ error: `AI generation failed: ${e}` }, { status: 500 })
+    const msg = e instanceof Error ? e.message : String(e)
+    console.error('[plans] AI generation failed:', msg)
+    return NextResponse.json({ error: `AI generation failed: ${msg}` }, { status: 500 })
   }
 
   // Build rubric name → id map
