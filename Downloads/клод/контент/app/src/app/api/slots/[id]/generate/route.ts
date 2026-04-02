@@ -12,6 +12,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   const model: AIModel = body.model ?? 'gemini-2.5-flash-preview-04-17'
   const useWebSearch: boolean = body.use_web_search ?? false
+  const overrideTopic: string | undefined = body.topic || undefined
+  const overrideHook: string | undefined = body.hook || undefined
+  const overrideCta: string | undefined = body.cta || undefined
 
   // Fetch slot + plan + project + rubric
   const { data: slot, error: slotError } = await supabase
@@ -39,9 +42,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   let webContext = ''
   let sources: { title: string; url: string }[] = []
 
-  if (useWebSearch && process.env.USE_WEB_SEARCH === 'true' && slot.topic) {
+  const effectiveSlot = {
+    ...slot,
+    topic: overrideTopic ?? slot.topic,
+    hook: overrideHook ?? slot.hook,
+    cta: overrideCta ?? slot.cta,
+  }
+
+  if (useWebSearch && process.env.USE_WEB_SEARCH === 'true' && effectiveSlot.topic) {
     try {
-      const results = await fetchPostContext(slot.topic, project.niche)
+      const results = await fetchPostContext(effectiveSlot.topic, project.niche)
       const top = extractTopResults(results, 3, 200)
       webContext = resultsToContext(top)
       sources = top.map((r: { title: string; url: string }) => ({ title: r.title, url: r.url }))
@@ -51,7 +61,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   // Build prompt & generate
-  const { system, user } = buildPostPrompt(slot, project, rubricName, webContext)
+  const { system, user } = buildPostPrompt(effectiveSlot, project, rubricName, webContext)
 
   let content: string
   try {
@@ -75,6 +85,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       model_used: model,
       status: 'draft',
       sources: sources.length ? sources : null,
+      ...(overrideTopic !== undefined && { topic: overrideTopic }),
+      ...(overrideHook !== undefined && { hook: overrideHook }),
+      ...(overrideCta !== undefined && { cta: overrideCta }),
     })
     .eq('id', id)
     .select()

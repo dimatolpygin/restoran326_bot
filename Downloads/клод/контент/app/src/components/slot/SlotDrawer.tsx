@@ -46,7 +46,7 @@ export function SlotDrawer({ slot, rubrics, onClose, onUpdate }: SlotDrawerProps
       const res = await fetch(`/api/slots/${slot.id}/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, use_web_search: useWebSearch }),
+        body: JSON.stringify({ model, use_web_search: useWebSearch, topic, hook, cta }),
       })
       const data = await res.json()
       if (res.ok) {
