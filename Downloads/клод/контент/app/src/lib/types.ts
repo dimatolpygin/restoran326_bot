@@ -103,6 +103,27 @@ export const PLATFORM_LABELS: Record<Platform, string> = {
   youtube: 'YouTube',
 }
 
+export interface RSSSource {
+  id: string
+  project_id: string
+  type: 'twitter' | 'telegram'
+  handle: string
+  name?: string
+  created_at: string
+}
+
+export interface FeedItem {
+  id: string
+  sourceId: string
+  sourceType: 'twitter' | 'telegram'
+  sourceHandle: string
+  title: string
+  content: string
+  imageUrl?: string
+  link: string
+  pubDate: string
+}
+
 export const RUBRIC_PRESETS = [
   { name: 'Польза', description: 'Полезные советы, гайды, инструкции', color: '#3b82f6' },
   { name: 'Кейсы', description: 'Истории успеха, кейсы клиентов', color: '#8b5cf6' },
