@@ -43,7 +43,14 @@ export async function invalidateSourceCache(source: RSSSource): Promise<void> {
   await cacheDel(cacheKeyForSource(source))
 }
 
-export async function fetchSourceFeed(source: RSSSource): Promise<FeedItem[]> {
+const ERROR_TTL = 30 // 30s for failed fetches
+
+export interface FetchResult {
+  items: FeedItem[]
+  error?: string
+}
+
+export async function fetchSourceFeed(source: RSSSource): Promise<FetchResult> {
   const path =
     source.type === 'twitter'
       ? `/twitter/user/${source.handle}`
@@ -53,26 +60,39 @@ export async function fetchSourceFeed(source: RSSSource): Promise<FeedItem[]> {
   const cacheKey = cacheKeyForSource(source)
 
   const cached = await cacheGet(cacheKey)
-  if (cached) return JSON.parse(cached) as FeedItem[]
+  if (cached) return JSON.parse(cached) as FetchResult
 
   let res: Response
   try {
     res = await fetch(url, { signal: AbortSignal.timeout(10000) })
   } catch {
-    return []
+    const result: FetchResult = { items: [], error: 'timeout' }
+    await cacheSet(cacheKey, JSON.stringify(result), ERROR_TTL)
+    return result
   }
 
-  if (!res.ok) return []
+  if (!res.ok) {
+    const result: FetchResult = { items: [], error: `HTTP ${res.status}` }
+    await cacheSet(cacheKey, JSON.stringify(result), ERROR_TTL)
+    return result
+  }
 
   let data: { items?: JsonFeedItem[]; error?: unknown }
   try {
     data = await res.json()
   } catch {
-    return []
+    const result: FetchResult = { items: [], error: 'invalid response' }
+    await cacheSet(cacheKey, JSON.stringify(result), ERROR_TTL)
+    return result
   }
 
   // RSSHub returns {"error":{...}} for failed routes even with status 200
-  if (data.error) return []
+  if (data.error) {
+    const msg = (data.error as { message?: string })?.message ?? 'rsshub error'
+    const result: FetchResult = { items: [], error: msg }
+    await cacheSet(cacheKey, JSON.stringify(result), ERROR_TTL)
+    return result
+  }
 
   const rawItems: JsonFeedItem[] = data.items ?? []
 
@@ -106,6 +126,7 @@ export async function fetchSourceFeed(source: RSSSource): Promise<FeedItem[]> {
     }
   })
 
-  await cacheSet(cacheKey, JSON.stringify(items), TTL)
-  return items
+  const result: FetchResult = { items }
+  await cacheSet(cacheKey, JSON.stringify(result), TTL)
+  return result
 }

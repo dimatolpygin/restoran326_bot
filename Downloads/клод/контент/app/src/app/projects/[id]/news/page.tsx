@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import { Send, X as XIcon, Plus, Trash2, RefreshCw, ExternalLink, Image as ImageIcon } from 'lucide-react'
+import { Send, X as XIcon, Plus, Trash2, RefreshCw, ExternalLink, Image as ImageIcon, AlertTriangle } from 'lucide-react'
 import type { RSSSource, FeedItem } from '@/lib/types'
 
 type PeriodValue = 'today' | '3d' | 'week' | 'month' | 'all'
@@ -42,6 +42,7 @@ export default function NewsPage() {
   const [items, setItems] = useState<FeedItem[]>([])
   const [period, setPeriod] = useState<PeriodValue>('week')
   const [sourceFilter, setSourceFilter] = useState('all')
+  const [sourceErrors, setSourceErrors] = useState<Record<string, string>>({})
   const [loadingSources, setLoadingSources] = useState(true)
   const [loadingFeed, setLoadingFeed] = useState(false)
 
@@ -73,7 +74,9 @@ export default function NewsPage() {
         { cache: 'no-store' }
       )
       const data = await res.json()
-      setItems(Array.isArray(data) ? data : [])
+      const result = Array.isArray(data) ? { items: data, sourceErrors: {} } : data
+      setItems(result.items ?? [])
+      setSourceErrors(result.sourceErrors ?? {})
     } finally {
       setLoadingFeed(false)
     }
@@ -98,6 +101,7 @@ export default function NewsPage() {
         setAddHandle('')
         setAddName('')
         setShowAddForm(false)
+        loadFeed(false)
       }
     } finally {
       setAdding(false)
@@ -176,6 +180,11 @@ export default function NewsPage() {
                     @{s.handle}
                     {s.name && <span className="text-[#555] ml-1">·{s.name}</span>}
                   </span>
+                  {sourceErrors[s.id] && (
+                    <span title={sourceErrors[s.id]} className="text-[#f59e0b]">
+                      <AlertTriangle size={10} />
+                    </span>
+                  )}
                   <button
                     onClick={() => handleDeleteSource(s.id)}
                     className="opacity-0 group-hover:opacity-100 text-[#555] hover:text-[#ef4444] transition-all"
