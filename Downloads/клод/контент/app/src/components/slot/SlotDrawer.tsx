@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ContentSlot, Rubric, SlotStatus, AIModel, TavilyResult } from '@/lib/types'
+import { ContentSlot, Rubric, SlotStatus, AIModel, TavilyResult, Attachment } from '@/lib/types'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { ModelSelector } from './ModelSelector'
 import { PostEditor } from './PostEditor'
+import { AttachmentSection } from './AttachmentSection'
 import { X, Wand2 } from 'lucide-react'
 
 interface SlotDrawerProps {
@@ -27,6 +28,7 @@ export function SlotDrawer({ slot, rubrics, onClose, onUpdate }: SlotDrawerProps
   const [content, setContent] = useState('')
   const [status, setStatus] = useState<SlotStatus>('idea')
   const [sources, setSources] = useState<TavilyResult[]>([])
+  const [attachments, setAttachments] = useState<Attachment[]>([])
 
   useEffect(() => {
     if (slot) {
@@ -36,6 +38,7 @@ export function SlotDrawer({ slot, rubrics, onClose, onUpdate }: SlotDrawerProps
       setContent(slot.content ?? '')
       setStatus(slot.status)
       setSources((slot.sources as TavilyResult[]) ?? [])
+      setAttachments(slot.attachments ?? [])
     }
   }, [slot?.id])
 
@@ -53,6 +56,7 @@ export function SlotDrawer({ slot, rubrics, onClose, onUpdate }: SlotDrawerProps
         setContent(data.slot.content ?? '')
         setStatus(data.slot.status)
         setSources(data.sources ?? [])
+        setAttachments(data.slot.attachments ?? [])
         onUpdate(data.slot)
       }
     } finally {
@@ -173,6 +177,16 @@ export function SlotDrawer({ slot, rubrics, onClose, onUpdate }: SlotDrawerProps
             content={content}
             onChange={setContent}
             sources={sources}
+          />
+
+          {/* Attachments */}
+          <AttachmentSection
+            slotId={slot.id}
+            attachments={attachments}
+            onUpdate={(updated) => {
+              setAttachments(updated.attachments ?? [])
+              onUpdate(updated)
+            }}
           />
         </div>
 

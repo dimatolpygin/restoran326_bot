@@ -37,6 +37,14 @@ export interface Rubric {
   created_at: string
 }
 
+export interface Attachment {
+  url: string
+  path: string
+  name: string
+  uploaded_at: string
+  type: 'uploaded' | 'generated'
+}
+
 export interface ContentSlot {
   id: string
   plan_id: string
@@ -51,6 +59,7 @@ export interface ContentSlot {
   model_used?: string | null
   status: SlotStatus
   sources?: TavilyResult[] | null
+  attachments?: Attachment[]
   created_at: string
   updated_at: string
 }
