@@ -83,13 +83,17 @@ export async function POST(req: Request) {
       { max_tokens: 4000 }
     )
 
-    // Strip markdown code fences if model wrapped the JSON
-    const cleaned = response.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-    const parsed = JSON.parse(cleaned)
+    console.log('[plans] raw AI response:', response.slice(0, 500))
+    const jsonMatch = response.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error(`No JSON in response. Raw: ${response.slice(0, 200)}`)
+    const parsed = JSON.parse(jsonMatch[0])
     slots = parsed.slots ?? []
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     console.error('[plans] AI generation failed:', msg)
+    // Cleanup orphaned plan + rubrics
+    await supabase.from('rubrics').delete().eq('plan_id', plan.id)
+    await supabase.from('content_plans').delete().eq('id', plan.id)
     return NextResponse.json({ error: `AI generation failed: ${msg}` }, { status: 500 })
   }
 

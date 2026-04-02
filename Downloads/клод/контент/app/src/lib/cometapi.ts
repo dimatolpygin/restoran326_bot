@@ -40,8 +40,9 @@ export async function callModel(
     body.response_format = opts.response_format
   }
 
-  // Gemini models need thinking_budget: 0 to avoid thinking overhead
-  if (model.startsWith('gemini')) {
+  // thinking_budget: 0 only for models that support thinking
+  const THINKING_MODELS = ['gemini-2.5-flash-preview-04-17']
+  if (THINKING_MODELS.includes(model)) {
     body.extra_body = { thinking_budget: 0 }
   }
 
