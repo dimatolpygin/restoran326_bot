@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { fetchSourceFeed } from '@/lib/rsshub'
+import { fetchSourceFeed, invalidateSourceCache } from '@/lib/rsshub'
 import type { RSSSource, FeedItem } from '@/lib/types'
 
 function getPeriodCutoff(period: string): Date | null {
@@ -63,4 +63,20 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   filtered2.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
 
   return NextResponse.json(filtered2)
+}
+
+// DELETE — invalidate cache for all sources of this project
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = createServerClient()
+  const { data: sources } = await supabase
+    .from('rss_sources')
+    .select('*')
+    .eq('project_id', id)
+
+  if (sources) {
+    await Promise.allSettled((sources as RSSSource[]).map(invalidateSourceCache))
+  }
+
+  return NextResponse.json({ success: true })
 }

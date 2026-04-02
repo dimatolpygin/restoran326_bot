@@ -62,9 +62,12 @@ export default function NewsPage() {
     }
   }
 
-  const loadFeed = useCallback(async () => {
+  const loadFeed = useCallback(async (invalidate = false) => {
     setLoadingFeed(true)
     try {
+      if (invalidate) {
+        await fetch(`/api/projects/${id}/news`, { method: 'DELETE' })
+      }
       const res = await fetch(
         `/api/projects/${id}/news?period=${period}&source=${sourceFilter}`,
         { cache: 'no-store' }
@@ -214,7 +217,7 @@ export default function NewsPage() {
           </select>
 
           <button
-            onClick={loadFeed}
+            onClick={() => loadFeed(true)}
             disabled={loadingFeed}
             className="flex items-center gap-1 text-[#737373] hover:text-[#f5f5f5] text-xs transition-colors disabled:opacity-40"
           >

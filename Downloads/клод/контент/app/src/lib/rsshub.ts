@@ -1,4 +1,4 @@
-import { cacheGet, cacheSet } from './redis'
+import { cacheGet, cacheSet, cacheDel } from './redis'
 import type { RSSSource, FeedItem } from './types'
 
 const RSSHUB_BASE = process.env.RSSHUB_BASE_URL ?? 'http://localhost:1200'
@@ -13,6 +13,36 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500)
 }
 
+// JSON Feed 1.0/1.1 item shape (what RSSHub returns with ?format=json)
+interface JsonFeedItem {
+  id?: string
+  url?: string
+  title?: string
+  content_html?: string
+  content_text?: string
+  image?: string                               // top-level image
+  date_published?: string
+  attachments?: Array<{ url: string; mime_type?: string }>
+  // some RSSHub routes also include legacy rss-style fields
+  link?: string
+  description?: string
+  pubDate?: string
+  enclosure?: { url?: string }
+}
+
+export function cacheKeyForSource(source: RSSSource): string {
+  const path =
+    source.type === 'twitter'
+      ? `/twitter/user/${source.handle}`
+      : `/telegram/channel/${source.handle}`
+  const url = `${RSSHUB_BASE}${path}?format=json`
+  return `rsshub:${Buffer.from(url).toString('base64').slice(0, 64)}`
+}
+
+export async function invalidateSourceCache(source: RSSSource): Promise<void> {
+  await cacheDel(cacheKeyForSource(source))
+}
+
 export async function fetchSourceFeed(source: RSSSource): Promise<FeedItem[]> {
   const path =
     source.type === 'twitter'
@@ -20,7 +50,7 @@ export async function fetchSourceFeed(source: RSSSource): Promise<FeedItem[]> {
       : `/telegram/channel/${source.handle}`
 
   const url = `${RSSHUB_BASE}${path}?format=json`
-  const cacheKey = `rsshub:${Buffer.from(url).toString('base64').slice(0, 64)}`
+  const cacheKey = cacheKeyForSource(source)
 
   const cached = await cacheGet(cacheKey)
   if (cached) return JSON.parse(cached) as FeedItem[]
@@ -34,28 +64,47 @@ export async function fetchSourceFeed(source: RSSSource): Promise<FeedItem[]> {
 
   if (!res.ok) return []
 
-  let data: { items?: unknown[] }
+  let data: { items?: JsonFeedItem[]; error?: unknown }
   try {
     data = await res.json()
   } catch {
     return []
   }
 
-  const items: FeedItem[] = ((data.items ?? []) as Record<string, unknown>[])
-    .slice(0, 30)
-    .map((item, i) => ({
-      id: `${source.id}-${i}`,
+  // RSSHub returns {"error":{...}} for failed routes even with status 200
+  if (data.error) return []
+
+  const rawItems: JsonFeedItem[] = data.items ?? []
+
+  const items: FeedItem[] = rawItems.slice(0, 30).map((item, i) => {
+    // Prefer JSON Feed fields, fall back to legacy RSS fields
+    const html = item.content_html ?? item.description ?? ''
+    const text = item.content_text ?? stripHtml(html)
+    const link = item.url ?? item.link ?? ''
+    const pubDate = item.date_published ?? item.pubDate ?? new Date().toISOString()
+
+    // Image: top-level image > first attachment with image mime > <img> in HTML
+    const firstImageAttachment = item.attachments?.find((a) =>
+      a.mime_type?.startsWith('image/')
+    )?.url
+    const imageUrl =
+      item.image ??
+      firstImageAttachment ??
+      item.enclosure?.url ??
+      extractFirstImage(html)
+
+    return {
+      id: item.id ?? `${source.id}-${i}`,
       sourceId: source.id,
       sourceType: source.type,
       sourceHandle: source.handle,
-      title: (item.title as string) ?? '',
-      content: stripHtml((item.description as string) ?? (item.title as string) ?? ''),
-      imageUrl:
-        (item.enclosure as { url?: string } | undefined)?.url ??
-        extractFirstImage((item.description as string) ?? ''),
-      link: (item.link as string) ?? '',
-      pubDate: (item.pubDate as string) ?? new Date().toISOString(),
-    }))
+      title: item.title ?? '',
+      content: text.slice(0, 500),
+      imageUrl,
+      link,
+      pubDate,
+    }
+  })
 
   await cacheSet(cacheKey, JSON.stringify(items), TTL)
   return items
