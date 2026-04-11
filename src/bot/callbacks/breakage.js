@@ -43,17 +43,21 @@ async function setupBreakageCallbacks(bot) {
 
     // Правим кнопки в группе
     const adminName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ');
+    const msg = ctx.callbackQuery.message;
     try {
-      await ctx.editMessageCaption(
-        ctx.callbackQuery.message.caption +
-          `\n\n✅ *Принята* администратором ${adminName}`,
-        {
-          parse_mode: 'Markdown',
-          reply_markup: { inline_keyboard: [] },
-        }
-      );
+      if (msg.photo) {
+        await ctx.editMessageCaption(
+          msg.caption + `\n\n✅ *Принята* администратором ${adminName}`,
+          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
+        );
+      } else {
+        await ctx.editMessageText(
+          msg.text + `\n\n✅ *Принята* администратором ${adminName}`,
+          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
+        );
+      }
     } catch (e) {
-      console.error('[accept] edit caption error:', e.message);
+      console.error('[accept] edit message error:', e.message);
     }
   });
 
@@ -86,17 +90,21 @@ async function setupBreakageCallbacks(bot) {
       .eq('id', reqId);
 
     const adminName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ');
+    const msg = ctx.callbackQuery.message;
     try {
-      await ctx.editMessageCaption(
-        ctx.callbackQuery.message.caption +
-          `\n\n❌ *Отклонена* администратором ${adminName}`,
-        {
-          parse_mode: 'Markdown',
-          reply_markup: { inline_keyboard: [] },
-        }
-      );
+      if (msg.photo) {
+        await ctx.editMessageCaption(
+          msg.caption + `\n\n❌ *Отклонена* администратором ${adminName}`,
+          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
+        );
+      } else {
+        await ctx.editMessageText(
+          msg.text + `\n\n❌ *Отклонена* администратором ${adminName}`,
+          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
+        );
+      }
     } catch (e) {
-      console.error('[reject] edit caption error:', e.message);
+      console.error('[reject] edit message error:', e.message);
     }
   });
 }
