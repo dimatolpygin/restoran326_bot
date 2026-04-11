@@ -77,7 +77,7 @@ async function showList(ctx, page) {
   let text = `📋 *Все заявки* \\(стр\\. ${page + 1}/${totalPages || 1}, всего ${count || 0}\\)\n\n`;
 
   if (items.length === 0) {
-    text += '_Заявок пока нет._';
+    text += '_Заявок пока нет\\._';
   } else {
     items.forEach((r, i) => {
       const num = from + i + 1;
