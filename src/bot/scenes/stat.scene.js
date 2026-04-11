@@ -87,7 +87,7 @@ async function showList(ctx, page) {
       }).split('.').reverse().join('.');
       const emoji = reasonEmoji(r.reason);
       const user = r.tg_username ? `@${escMd(r.tg_username)} ${escMd(r.tg_name)}` : escMd(r.tg_name);
-      text += `${num}\\. ${escMd(date)} | ${emoji} | ${user} \\(ID: ${r.tg_user_id}\\)\n`;
+      text += `${num}\\. ${escMd(date)} \\| ${emoji} \\| ${user} \\(ID: ${r.tg_user_id}\\)\n`;
     });
   }
 
