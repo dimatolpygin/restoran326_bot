@@ -10,7 +10,7 @@ function reasonEmoji(text) {
 }
 
 function escMd(text) {
-  return String(text ?? '').replace(/[_*`[]/g, '\\$&');
+  return String(text ?? '').replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
 }
 
 // ── Диапазоны периодов ────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ async function showList(ctx, page) {
   const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
   const items = rows || [];
 
-  let text = `📋 *Все заявки* (стр. ${page + 1}/${totalPages || 1}, всего ${count || 0})\n\n`;
+  let text = `📋 *Все заявки* \\(стр\\. ${page + 1}/${totalPages || 1}, всего ${count || 0}\\)\n\n`;
 
   if (items.length === 0) {
     text += '_Заявок пока нет._';
@@ -141,11 +141,11 @@ async function showDetail(ctx, id, backPage) {
   });
 
   const statusIcon = r.status === 'accepted' ? '✅ Принята' : r.status === 'rejected' ? '❌ Отклонена' : '⏳ Ожидает';
-  const user = r.tg_username ? `@${r.tg_username} ${r.tg_name}` : r.tg_name;
+  const user = r.tg_username ? `@${escMd(r.tg_username)} ${escMd(r.tg_name)}` : escMd(r.tg_name);
   const emoji = reasonEmoji(r.reason);
 
   const text =
-    `📋 *Заявка #${r.id}*\n\n` +
+    `📋 *Заявка \\#${r.id}*\n\n` +
     `📅 ${escMd(date)}\n` +
     `🏬 Склад: ${escMd(r.warehouses?.name || '—')}\n` +
     `🍽 Товар: ${escMd(r.items?.name || '—')} — ${r.quantity} шт\\.\n` +
@@ -269,8 +269,8 @@ async function showCat(ctx, idx, period, customStart, customEnd) {
       const date = new Date(r.created_at).toLocaleDateString('ru-RU', {
         timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit',
       });
-      const user = r.tg_username ? `@${r.tg_username} ${r.tg_name}` : r.tg_name;
-      text += `${i + 1}\\. ${escMd(date)} — ${escMd(r.items?.name || '—')} — ${r.quantity} шт\\. — 👤 ${escMd(user)}\n`;
+      const user = r.tg_username ? `@${escMd(r.tg_username)} ${escMd(r.tg_name)}` : escMd(r.tg_name);
+      text += `${i + 1}\\. ${escMd(date)} — ${escMd(r.items?.name || '—')} — ${r.quantity} шт\\. — 👤 ${user}\n`;
     });
   }
 
