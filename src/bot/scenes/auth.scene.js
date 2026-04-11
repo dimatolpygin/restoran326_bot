@@ -49,7 +49,8 @@ authScene.on('text', async (ctx) => {
     .single();
 
   if (error || !setting) {
-    return ctx.reply('⚠️ Ошибка конфигурации. Обратитесь к администратору.');
+    console.error('[auth] bot_settings fetch error:', error?.message);
+    return ctx.reply('⚠️ Сервис временно недоступен. Попробуйте через минуту.');
   }
 
   const isValid = await bcrypt.compare(input, setting.value);

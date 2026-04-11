@@ -13,21 +13,40 @@ const setupBreakageCallbacks = require('./callbacks/breakage');
 function createBot() {
   const bot = new Telegraf(process.env.BOT_TOKEN);
 
-  // ── Session через Redis ─────────────────────────────────────────
-  const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+  // ── Session через Redis (с fallback на память при недоступности) ──
+  const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    retryStrategy: (times) => (times > 3 ? null : Math.min(times * 500, 2000)),
+  });
+  redis.on('error', () => {}); // подавляем unhandled error
+
+  const memoryStore = new Map();
 
   bot.use(
     session({
       store: {
         async get(key) {
-          const data = await redis.get(`tg_session:${key}`);
-          return data ? JSON.parse(data) : undefined;
+          try {
+            const data = await redis.get(`tg_session:${key}`);
+            return data ? JSON.parse(data) : undefined;
+          } catch {
+            return memoryStore.get(key);
+          }
         },
         async set(key, val) {
-          await redis.set(`tg_session:${key}`, JSON.stringify(val), 'EX', 86400);
+          try {
+            await redis.set(`tg_session:${key}`, JSON.stringify(val), 'EX', 86400);
+          } catch {
+            memoryStore.set(key, val);
+          }
         },
         async delete(key) {
-          await redis.del(`tg_session:${key}`);
+          try {
+            await redis.del(`tg_session:${key}`);
+          } catch {
+            memoryStore.delete(key);
+          }
         },
       },
     })

@@ -22,8 +22,13 @@ async function authMiddleware(ctx, next) {
     .eq('tg_id', tgId)
     .single();
 
-  if (error || !user || !user.is_active) {
-    // Не авторизован или деактивирован — входим в сцену авторизации
+  // Сетевая ошибка (не "not found") — пропускаем, не гоним на авторизацию
+  if (error && error.code !== 'PGRST116') {
+    console.error('[auth] Supabase error, skipping auth check:', error.message);
+    return next();
+  }
+
+  if (!user || !user.is_active) {
     return ctx.scene.enter('auth');
   }
 
