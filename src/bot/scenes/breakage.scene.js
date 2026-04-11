@@ -5,7 +5,18 @@ require('dotenv').config();
 const PAGE_SIZE = 8;
 const SEARCH_PAGE_SIZE = 20;
 
-const REASONS = ['Скол/трещина', 'Разбито', 'Брак производства', 'Другое'];
+const REASONS = [
+  { emoji: '👥', text: 'Разбили гости' },
+  { emoji: '🔑', text: 'Разбили на мойке' },
+  { emoji: '🍸', text: 'Разбили сотрудники бара' },
+  { emoji: '👨‍🍳', text: 'Разбили сотрудники кухни' },
+  { emoji: '🍽️', text: 'Разбили сотрудники зала' },
+  { emoji: '🔨', text: 'Скол/трещина' },
+  { emoji: '🚚', text: 'Бой при транспортировке' },
+  { emoji: '🚪', text: 'Ударили дверью/случайно не видели' },
+  { emoji: '🎨', text: 'Порча/некорректный внешний вид' },
+  { emoji: '❓', text: 'Утерянная/разбитая' },
+];
 
 function escMd(text) {
   return String(text ?? '').replace(/[_*`[]/g, '\\$&');
@@ -244,7 +255,7 @@ const breakageScene = new Scenes.WizardScene(
       const itemId = parseInt(data.replace('bitem_', ''));
       const { data: item } = await supabase
         .from('items')
-        .select('id, name, quantity')
+        .select('id, name, quantity, photo_file_id')
         .eq('id', itemId)
         .single();
 
@@ -257,10 +268,12 @@ const breakageScene = new Scenes.WizardScene(
       ctx.wizard.state.itemName = item.name;
       ctx.wizard.state.maxQty = item.quantity;
 
-      await ctx.reply(
-        `🍽 Выбрано: *${item.name}*\n📦 Остаток: ${item.quantity} шт.\n\nВведите количество (число от 1 до ${item.quantity}):`,
-        { parse_mode: 'Markdown', ...Markup.removeKeyboard() }
-      );
+      const caption = `🍽 Выбрано: *${item.name}*\n📦 Остаток: ${item.quantity} шт.\n\nВведите количество (число от 1 до ${item.quantity}):`;
+      if (item.photo_file_id) {
+        await ctx.replyWithPhoto(item.photo_file_id, { caption, parse_mode: 'Markdown', ...Markup.removeKeyboard() });
+      } else {
+        await ctx.reply(caption, { parse_mode: 'Markdown', ...Markup.removeKeyboard() });
+      }
       return ctx.wizard.next();
     }
   },
@@ -285,7 +298,10 @@ const breakageScene = new Scenes.WizardScene(
 
     ctx.wizard.state.quantity = qty;
 
-    const reasonBtns = REASONS.map((r) => [Markup.button.callback(r, `reason_${r}`)]);
+    const reasonBtns = REASONS.map((r, i) => [
+      Markup.button.callback(`${r.emoji} ${r.text}`, `reason_${i}`),
+    ]);
+    reasonBtns.push([Markup.button.callback('✏️ Другая причина', 'reason_custom')]);
     reasonBtns.push([Markup.button.callback('❌ Отмена', 'cancel')]);
 
     await ctx.reply('🔩 Укажите причину:', Markup.inlineKeyboard(reasonBtns));
@@ -299,7 +315,10 @@ const breakageScene = new Scenes.WizardScene(
       if (!ctx.message?.text) return;
       ctx.wizard.state.reason = ctx.message.text.trim();
       ctx.wizard.state.waitingCustomReason = false;
-      await ctx.reply('📸 Прикрепите фото повреждения:');
+      await ctx.reply('📸 Прикрепите фото повреждения:', Markup.inlineKeyboard([
+        [Markup.button.callback('⏭ Пропустить', 'skip_photo')],
+        [Markup.button.callback('❌ Отмена', 'cancel')],
+      ]));
       return ctx.wizard.next();
     }
 
@@ -314,14 +333,17 @@ const breakageScene = new Scenes.WizardScene(
     }
 
     if (data.startsWith('reason_')) {
-      const reason = data.replace('reason_', '');
-      if (reason === 'Другое') {
+      const idx = data.replace('reason_', '');
+      if (idx === 'custom') {
         ctx.wizard.state.waitingCustomReason = true;
         await ctx.reply('✏️ Введите причину:');
         return; // остаёмся на шаге 5
       }
-      ctx.wizard.state.reason = reason;
-      await ctx.reply('📸 Прикрепите фото повреждения:');
+      ctx.wizard.state.reason = REASONS[parseInt(idx)]?.text;
+      await ctx.reply('📸 Прикрепите фото повреждения:', Markup.inlineKeyboard([
+        [Markup.button.callback('⏭ Пропустить', 'skip_photo')],
+        [Markup.button.callback('❌ Отмена', 'cancel')],
+      ]));
       return ctx.wizard.next();
     }
   },
@@ -334,12 +356,15 @@ const breakageScene = new Scenes.WizardScene(
       return ctx.scene.leave();
     }
 
-    if (!ctx.message?.photo) {
-      return ctx.reply('⚠️ Пожалуйста, отправьте фото (не файл):');
+    if (ctx.callbackQuery?.data === 'skip_photo') {
+      await ctx.answerCbQuery();
+      ctx.wizard.state.photoFileId = null;
+    } else if (ctx.message?.photo) {
+      const photos = ctx.message.photo;
+      ctx.wizard.state.photoFileId = photos[photos.length - 1].file_id;
+    } else {
+      return ctx.reply('⚠️ Пожалуйста, отправьте фото (не файл) или нажмите «Пропустить»:');
     }
-
-    const photos = ctx.message.photo;
-    ctx.wizard.state.photoFileId = photos[photos.length - 1].file_id;
 
     const s = ctx.wizard.state;
     const text =
@@ -348,16 +373,16 @@ const breakageScene = new Scenes.WizardScene(
       `💥 Количество: ${s.quantity} шт.\n` +
       `🔩 Причина: ${escMd(s.reason)}`;
 
-    await ctx.replyWithPhoto(s.photoFileId, {
-      caption: text,
-      parse_mode: 'Markdown',
-      ...Markup.inlineKeyboard([
-        [
-          Markup.button.callback('✅ Подтвердить', 'confirm'),
-          Markup.button.callback('❌ Отмена', 'cancel'),
-        ],
-      ]),
-    });
+    const confirmKeyboard = Markup.inlineKeyboard([[
+      Markup.button.callback('✅ Подтвердить', 'confirm'),
+      Markup.button.callback('❌ Отмена', 'cancel'),
+    ]]);
+
+    if (s.photoFileId) {
+      await ctx.replyWithPhoto(s.photoFileId, { caption: text, parse_mode: 'Markdown', ...confirmKeyboard });
+    } else {
+      await ctx.reply(text, { parse_mode: 'Markdown', ...confirmKeyboard });
+    }
 
     return ctx.wizard.next();
   },
@@ -435,11 +460,19 @@ const breakageScene = new Scenes.WizardScene(
       ]);
 
       try {
-        const sent = await ctx.telegram.sendPhoto(adminChatId, s.photoFileId, {
-          caption: groupText,
-          parse_mode: 'Markdown',
-          ...groupKeyboard,
-        });
+        let sent;
+        if (s.photoFileId) {
+          sent = await ctx.telegram.sendPhoto(adminChatId, s.photoFileId, {
+            caption: groupText,
+            parse_mode: 'Markdown',
+            ...groupKeyboard,
+          });
+        } else {
+          sent = await ctx.telegram.sendMessage(adminChatId, groupText, {
+            parse_mode: 'Markdown',
+            ...groupKeyboard,
+          });
+        }
 
         // Сохраняем message_id группы
         await supabase
