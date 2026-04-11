@@ -1,22 +1,10 @@
 const { Scenes, Markup } = require('telegraf');
 const supabase = require('../../lib/supabase');
+const REASONS = require('../../lib/reasons');
 require('dotenv').config();
 
 const PAGE_SIZE = 8;
 const SEARCH_PAGE_SIZE = 20;
-
-const REASONS = [
-  { emoji: '👥', text: 'Разбили гости' },
-  { emoji: '🔑', text: 'Разбили на мойке' },
-  { emoji: '🍸', text: 'Разбили сотрудники бара' },
-  { emoji: '👨‍🍳', text: 'Разбили сотрудники кухни' },
-  { emoji: '🍽️', text: 'Разбили сотрудники зала' },
-  { emoji: '🔨', text: 'Скол/трещина' },
-  { emoji: '🚚', text: 'Бой при транспортировке' },
-  { emoji: '🚪', text: 'Ударили дверью/случайно не видели' },
-  { emoji: '🎨', text: 'Порча/некорректный внешний вид' },
-  { emoji: '❓', text: 'Утерянная/разбитая' },
-];
 
 function escMd(text) {
   return String(text ?? '').replace(/[_*`[]/g, '\\$&');
