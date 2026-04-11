@@ -394,7 +394,23 @@ statScene.action(/^stop_(tod|wk|mo|all|cst)$/, async (ctx) => {
   await showTop(ctx, period, ctx.scene.state.customStart, ctx.scene.state.customEnd);
 });
 
-// Выход из сцены по slist_0 когда awaitingPeriod — через action выше
+// Выход из сцены по командам
+statScene.command('start', async (ctx) => {
+  await ctx.scene.leave();
+  await ctx.scene.enter('catalog_warehouse');
+});
+
+statScene.command('boy', async (ctx) => {
+  await ctx.scene.leave();
+  await ctx.scene.enter('breakage');
+});
+
+statScene.command('stat', async (ctx) => {
+  ctx.scene.state.customStart = null;
+  ctx.scene.state.customEnd = null;
+  ctx.scene.state.awaitingPeriod = false;
+  await showList(ctx, 0);
+});
 
 // Ввод произвольного периода
 statScene.on('text', async (ctx) => {
