@@ -393,21 +393,10 @@ const breakageScene = new Scenes.WizardScene(
     }
 
     if (data === 'breakage_more') {
-      const { data: warehouses } = await supabase
-        .from('warehouses')
-        .select('id, name')
-        .eq('is_active', true)
-        .order('name');
-
-      ctx.wizard.state = {};
-
-      const buttons = (warehouses || []).map((w) => [
-        Markup.button.callback(w.name, `bwh_${w.id}`),
-      ]);
-      buttons.push([Markup.button.callback('❌ Отмена', 'cancel')]);
-
-      await ctx.reply('🏬 Выберите склад:', Markup.inlineKeyboard(buttons));
-      ctx.wizard.selectStep(1);
+      const warehouseId = ctx.wizard.state.warehouseId;
+      ctx.wizard.state = { warehouseId };
+      await showBCategoriesKeyboard(ctx, warehouseId);
+      ctx.wizard.selectStep(2);
       return;
     }
 
