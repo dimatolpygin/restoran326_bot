@@ -1,5 +1,9 @@
 const supabase = require('../../lib/supabase');
 
+function escMd(str) {
+  return String(str ?? '').replace(/[_*`[]/g, '\\$&');
+}
+
 /**
  * Обработчик accept/reject из группы администраторов.
  * Регистрируется на уровне бота (не в сцене).
@@ -7,8 +11,6 @@ const supabase = require('../../lib/supabase');
 async function setupBreakageCallbacks(bot) {
   // ── Принять заявку ──────────────────────────────────────────────
   bot.action(/^accept_(\d+)$/, async (ctx) => {
-    await ctx.answerCbQuery();
-
     const reqId = parseInt(ctx.match[1]);
 
     const { data: req, error } = await supabase
@@ -41,30 +43,34 @@ async function setupBreakageCallbacks(bot) {
       })
       .eq('id', reqId);
 
+    await ctx.answerCbQuery();
+
     // Правим кнопки в группе
     const adminName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ');
+    const escapedAdmin = escMd(adminName);
     const msg = ctx.callbackQuery.message;
     try {
-      if (msg.photo) {
+      if (msg?.photo) {
         await ctx.editMessageCaption(
-          msg.caption + `\n\n✅ *Принята* администратором ${adminName}`,
+          msg.caption + `\n\n✅ *Принята* администратором ${escapedAdmin}`,
+          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
+        );
+      } else if (msg?.text) {
+        await ctx.editMessageText(
+          msg.text + `\n\n✅ *Принята* администратором ${escapedAdmin}`,
           { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
         );
       } else {
-        await ctx.editMessageText(
-          msg.text + `\n\n✅ *Принята* администратором ${adminName}`,
-          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
-        );
+        await ctx.reply(`✅ Заявка #${reqId} принята администратором ${adminName}`);
       }
     } catch (e) {
       console.error('[accept] edit message error:', e.message);
+      await ctx.reply(`✅ Заявка #${reqId} принята администратором ${adminName}`).catch(() => {});
     }
   });
 
   // ── Отклонить заявку ────────────────────────────────────────────
   bot.action(/^reject_(\d+)$/, async (ctx) => {
-    await ctx.answerCbQuery();
-
     const reqId = parseInt(ctx.match[1]);
 
     const { data: req } = await supabase
@@ -89,22 +95,28 @@ async function setupBreakageCallbacks(bot) {
       })
       .eq('id', reqId);
 
+    await ctx.answerCbQuery();
+
     const adminName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ');
+    const escapedAdmin = escMd(adminName);
     const msg = ctx.callbackQuery.message;
     try {
-      if (msg.photo) {
+      if (msg?.photo) {
         await ctx.editMessageCaption(
-          msg.caption + `\n\n❌ *Отклонена* администратором ${adminName}`,
+          msg.caption + `\n\n❌ *Отклонена* администратором ${escapedAdmin}`,
+          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
+        );
+      } else if (msg?.text) {
+        await ctx.editMessageText(
+          msg.text + `\n\n❌ *Отклонена* администратором ${escapedAdmin}`,
           { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
         );
       } else {
-        await ctx.editMessageText(
-          msg.text + `\n\n❌ *Отклонена* администратором ${adminName}`,
-          { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [] } }
-        );
+        await ctx.reply(`❌ Заявка #${reqId} отклонена администратором ${adminName}`);
       }
     } catch (e) {
       console.error('[reject] edit message error:', e.message);
+      await ctx.reply(`❌ Заявка #${reqId} отклонена администратором ${adminName}`).catch(() => {});
     }
   });
 }
