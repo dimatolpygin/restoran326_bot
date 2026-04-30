@@ -73,7 +73,7 @@ async function showItemsPage(ctx, warehouseId, page, categoryId) {
   const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
 
   const rows = (items || []).map((item) => [
-    Markup.button.callback(`${item.name} (${item.quantity} шт.)`, `bitem_${item.id}`),
+    Markup.button.callback(item.name, `bitem_${item.id}`),
   ]);
 
   const nav = [];
@@ -122,7 +122,7 @@ async function showSearchResults(ctx, warehouseId, searchQuery, page = 0) {
 
   const totalPages = Math.ceil(count / SEARCH_PAGE_SIZE);
   const rows = items.map((item) => [
-    Markup.button.callback(`${item.name} (${item.quantity} шт.)`, `bitem_${item.id}`),
+    Markup.button.callback(item.name, `bitem_${item.id}`),
   ]);
 
   const nav = [];
@@ -255,6 +255,7 @@ const breakageScene = new Scenes.WizardScene(
       ctx.wizard.state.itemId = item.id;
       ctx.wizard.state.itemName = item.name;
       ctx.wizard.state.maxQty = item.quantity;
+      ctx.wizard.state.itemPhotoFileId = item.photo_file_id || null;
 
       const caption = `🍽 Выбрано: *${item.name}*\n📦 Остаток: ${item.quantity} шт.\n\nВведите количество (число от 1 до ${item.quantity}):`;
       if (item.photo_file_id) {
@@ -366,8 +367,8 @@ const breakageScene = new Scenes.WizardScene(
       Markup.button.callback('❌ Отмена', 'cancel'),
     ]]);
 
-    if (s.photoFileId) {
-      await ctx.replyWithPhoto(s.photoFileId, { caption: text, parse_mode: 'Markdown', ...confirmKeyboard });
+    if (s.itemPhotoFileId) {
+      await ctx.replyWithPhoto(s.itemPhotoFileId, { caption: text, parse_mode: 'Markdown', ...confirmKeyboard });
     } else {
       await ctx.reply(text, { parse_mode: 'Markdown', ...confirmKeyboard });
     }
@@ -385,6 +386,29 @@ const breakageScene = new Scenes.WizardScene(
     if (data === 'cancel') {
       await ctx.reply('Заявка отменена.');
       return ctx.scene.leave();
+    }
+
+    if (data === 'breakage_done') {
+      return ctx.scene.leave();
+    }
+
+    if (data === 'breakage_more') {
+      const { data: warehouses } = await supabase
+        .from('warehouses')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name');
+
+      ctx.wizard.state = {};
+
+      const buttons = (warehouses || []).map((w) => [
+        Markup.button.callback(w.name, `bwh_${w.id}`),
+      ]);
+      buttons.push([Markup.button.callback('❌ Отмена', 'cancel')]);
+
+      await ctx.reply('🏬 Выберите склад:', Markup.inlineKeyboard(buttons));
+      ctx.wizard.selectStep(1);
+      return;
     }
 
     if (data === 'confirm') {
@@ -471,8 +495,11 @@ const breakageScene = new Scenes.WizardScene(
         console.error('[breakage] send to group error:', e.message);
       }
 
-      await ctx.reply('✅ Заявка отправлена на рассмотрение!');
-      return ctx.scene.leave();
+      await ctx.reply('✅ Заявка отправлена на рассмотрение!', Markup.inlineKeyboard([
+        [Markup.button.callback('📝 Списать ещё', 'breakage_more')],
+        [Markup.button.callback('✅ Готово', 'breakage_done')],
+      ]));
+      return;
     }
   }
 );
