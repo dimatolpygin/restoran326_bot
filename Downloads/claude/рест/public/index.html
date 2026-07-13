@@ -3,154 +3,266 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Número Uno Steakhouse · Reservas</title>
+  <title>Número Uno Steakhouse · Valencia</title>
   <style>
     :root {
       --bg: #0a0a0a;
       --panel: #141414;
       --panel-2: #1c1c1c;
       --red: #e30613;
+      --red-d: #b8050f;
       --red-soft: rgba(227, 6, 19, 0.15);
       --text: #f5f5f5;
       --muted: #9a9a9a;
       --line: #2a2a2a;
     }
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      justify-content: center;
       min-height: 100dvh;
     }
-    .app {
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      flex-direction: column;
-      height: 100dvh;
-      background: var(--bg);
-      border-left: 1px solid var(--line);
-      border-right: 1px solid var(--line);
-    }
-    header {
-      padding: 18px 18px 14px;
-      border-bottom: 1px solid var(--line);
-      background: #000;
+
+    /* ---------- Лендинг (клон страницы сайта) ---------- */
+    .nav {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 26px;
+      padding: 16px 32px;
+      background: #000;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
     }
     .logo {
       font-weight: 800;
       letter-spacing: 1px;
-      line-height: 0.95;
-      font-size: 20px;
+      line-height: 0.9;
+      font-size: 19px;
       text-transform: uppercase;
+      white-space: nowrap;
     }
     .logo b { color: var(--red); }
-    .logo small {
-      display: block;
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-    .status { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #35c759; box-shadow: 0 0 8px #35c759; }
+    .logo small { display: block; font-size: 9px; letter-spacing: 3px; color: var(--muted); font-weight: 600; }
+    .nav-links { display: flex; gap: 22px; margin-left: 18px; flex-wrap: wrap; }
+    .nav-links a { color: var(--text); text-decoration: none; font-size: 14px; font-weight: 500; opacity: 0.9; }
+    .nav-links a:hover { color: var(--red); }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+    .flag { font-size: 15px; }
 
-    .chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 18px 14px 8px;
+    .hero {
+      position: relative;
+      min-height: 74vh;
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      -webkit-overflow-scrolling: touch;
+      align-items: flex-end;
+      background: #000 url('/hero.jpg') no-repeat center right;
+      background-size: cover;
+      overflow: hidden;
     }
-    .msg { max-width: 82%; padding: 11px 14px; border-radius: 16px; font-size: 15px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.25) 100%);
+    }
+    .hero-inner { position: relative; padding: 0 32px 60px; max-width: 780px; }
+    .hero h1 {
+      font-size: clamp(38px, 6.5vw, 78px);
+      line-height: 0.98;
+      margin: 0 0 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+    .hero p { font-size: clamp(15px, 2vw, 19px); color: #e8e8e8; max-width: 520px; margin: 0 0 26px; }
+    .btn-red {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      border: 0;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 34px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .btn-red:hover { background: var(--red-d); }
+
+    .reserva {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 28px 32px;
+      border: 1px solid var(--line);
+      margin: 26px;
+      border-radius: 8px;
+    }
+    .reserva h2 { font-size: clamp(22px, 3vw, 30px); margin: 0; font-weight: 800; }
+    .reserva .pills { display: flex; gap: 14px; flex-wrap: wrap; margin-left: auto; }
+    .pill {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid var(--red);
+      border-radius: 999px;
+      padding: 11px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 0 12px var(--red-soft);
+    }
+    .pill:hover { background: var(--red); color: #fff; }
+
+    .footer-note { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+
+    @media (max-width: 720px) {
+      .nav-links { display: none; }
+      .reserva .pills { margin-left: 0; }
+    }
+
+    /* ---------- Плавающий чат-виджет ---------- */
+    .launcher {
+      position: fixed;
+      bottom: 22px; right: 22px;
+      width: 62px; height: 62px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 0;
+      cursor: pointer;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.5), 0 0 0 4px rgba(227,6,19,0.18);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      transition: transform 0.15s;
+    }
+    .launcher:hover { transform: scale(1.06); }
+    .launcher svg { width: 30px; height: 30px; fill: #fff; }
+    .launcher .badge {
+      position: absolute; top: -3px; right: -3px;
+      background: #fff; color: var(--red);
+      font-size: 11px; font-weight: 800;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--red);
+    }
+    .launcher.hidden { display: none; }
+
+    .widget {
+      position: fixed;
+      bottom: 22px; right: 22px;
+      width: 384px;
+      height: min(620px, 82dvh);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.6);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1001;
+    }
+    .widget.open { display: flex; animation: pop 0.18s ease-out; }
+    @keyframes pop { from { transform: translateY(14px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    .w-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px;
+      background: #000;
+      border-bottom: 1px solid var(--line);
+    }
+    .w-head .logo { font-size: 16px; }
+    .w-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #35c759; box-shadow: 0 0 8px #35c759; }
+    .w-close { margin-left: auto; background: none; border: 0; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 0 4px; }
+    .w-close:hover { color: #fff; }
+
+    .chat { flex: 1; overflow-y: auto; padding: 16px 12px 8px; display: flex; flex-direction: column; gap: 11px; -webkit-overflow-scrolling: touch; }
+    .msg { max-width: 84%; padding: 10px 13px; border-radius: 15px; font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
     .bot { align-self: flex-start; background: var(--panel-2); border: 1px solid var(--line); border-bottom-left-radius: 5px; }
     .user { align-self: flex-end; background: var(--red); color: #fff; border-bottom-right-radius: 5px; }
 
-    .typing { align-self: flex-start; background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; border-bottom-left-radius: 5px; padding: 13px 16px; display: none; }
+    .typing { align-self: flex-start; background: var(--panel-2); border: 1px solid var(--line); border-radius: 15px; border-bottom-left-radius: 5px; padding: 12px 15px; display: none; }
     .typing.show { display: flex; gap: 4px; }
     .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite; }
     .typing span:nth-child(2) { animation-delay: 0.2s; }
     .typing span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes blink { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
 
-    .booking {
-      align-self: flex-start;
-      max-width: 92%;
-      background: linear-gradient(180deg, #1e1e1e, #171717);
-      border: 1px solid var(--red);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 0 24px var(--red-soft);
-    }
-    .booking h4 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--red); }
-    .booking .row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 4px 0; border-bottom: 1px dashed var(--line); }
+    .booking { align-self: flex-start; max-width: 94%; background: linear-gradient(180deg, #1e1e1e, #171717); border: 1px solid var(--red); border-radius: 15px; padding: 15px; box-shadow: 0 0 22px var(--red-soft); }
+    .booking h4 { margin: 0 0 9px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--red); }
+    .booking .row { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; padding: 4px 0; border-bottom: 1px dashed var(--line); }
     .booking .row:last-of-type { border-bottom: 0; }
     .booking .row b { color: var(--muted); font-weight: 500; }
-    .booking a.confirm {
-      display: block;
-      margin-top: 14px;
-      background: var(--red);
-      color: #fff;
-      text-align: center;
-      text-decoration: none;
-      font-weight: 700;
-      padding: 13px;
-      border-radius: 999px;
-      letter-spacing: 0.3px;
-    }
-    .booking a.confirm:active { transform: scale(0.98); }
-    .booking .hint { margin: 9px 2px 0; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+    .booking a.confirm { display: block; margin-top: 12px; background: var(--red); color: #fff; text-align: center; text-decoration: none; font-weight: 700; padding: 12px; border-radius: 999px; }
+    .booking a.confirm:hover { background: var(--red-d); }
+    .booking .hint { margin: 8px 2px 0; font-size: 11px; color: var(--muted); line-height: 1.4; }
 
-    form { display: flex; gap: 8px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #000; }
-    input {
-      flex: 1;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 13px 16px;
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-    }
+    form { display: flex; gap: 8px; padding: 11px 12px calc(11px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #000; }
+    input { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 12px 15px; color: var(--text); font-size: 15px; outline: none; }
     input:focus { border-color: var(--red); }
-    button.send {
-      background: var(--red);
-      border: 0;
-      color: #fff;
-      width: 48px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
+    button.send { background: var(--red); border: 0; color: #fff; width: 46px; border-radius: 50%; font-size: 17px; cursor: pointer; flex-shrink: 0; }
     button.send:disabled { opacity: 0.5; }
-    .demo-badge { text-align: center; font-size: 11px; color: var(--muted); padding: 6px; background: #000; }
+
+    @media (max-width: 480px) {
+      .widget { width: auto; left: 10px; right: 10px; bottom: 10px; height: 86dvh; }
+      .launcher { bottom: 16px; right: 16px; }
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="logo">NÚMER<b>O</b><br />UNO<small>STEAKHOUSE</small></div>
-      <div class="status"><span class="dot"></span>En línea</div>
-    </header>
+  <!-- ================= Лендинг (1 страница их сайта) ================= -->
+  <nav class="nav">
+    <div class="logo">NÚMER<b>O</b> UNO<small>STEAKHOUSE</small></div>
+    <div class="nav-links">
+      <a href="#">Inicio</a>
+      <a href="#">Nuestros Steaks</a>
+      <a href="#">Carta</a>
+      <a href="#">Carta de vino</a>
+      <a href="#">Restaurantes</a>
+      <a href="#">Franquicia</a>
+      <a href="#">Contacto</a>
+    </div>
+    <div class="nav-right"><span class="flag">🇪🇸</span><span class="flag">🇬🇧</span></div>
+  </nav>
 
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>Los mejores steaks<br />de la ciudad!</h1>
+      <p>Jugosos, tiernos y perfectamente cocinados. El placer definitivo para los amantes de la carne.</p>
+      <button class="btn-red" onclick="openChat()">Reservar mesa</button>
+    </div>
+  </section>
+
+  <section class="reserva">
+    <h2>¡Reserva Ya!</h2>
+    <div class="pills">
+      <button class="pill" onclick="bookAt('Calle Ciscar (Ruzafa)')">Calle Ciscar 10</button>
+      <button class="pill" onclick="bookAt('Calle Corretgeria (Plaza de la Reina)')">Calle Corretgeria 7</button>
+      <button class="pill" onclick="bookAt('Avenida Baleares 32')">Avenida Baleares 32</button>
+    </div>
+  </section>
+
+  <div class="footer-note">Demo · Número Uno Steakhouse · el chat de la esquina responde y reserva</div>
+
+  <!-- ================= Плавающий чат-виджет ================= -->
+  <button class="launcher" id="launcher" onclick="openChat()" aria-label="Abrir chat">
+    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    <span class="badge">1</span>
+  </button>
+
+  <div class="widget" id="widget">
+    <div class="w-head">
+      <div class="logo">NÚMER<b>O</b> UNO</div>
+      <div class="w-status"><span class="dot"></span>En línea</div>
+      <button class="w-close" onclick="closeChat()" aria-label="Cerrar">×</button>
+    </div>
     <div class="chat" id="chat"></div>
     <div class="typing" id="typing"><span></span><span></span><span></span></div>
-
     <form id="form" autocomplete="off">
-      <input id="input" placeholder="Escribe tu mensaje…" autofocus />
+      <input id="input" placeholder="Escribe tu mensaje…" />
       <button class="send" id="send" type="submit" aria-label="Enviar">➤</button>
     </form>
-    <div class="demo-badge">Demo · Número Uno Steakhouse</div>
   </div>
 
   <script>
@@ -159,11 +271,32 @@
     const form = document.getElementById('form');
     const input = document.getElementById('input');
     const send = document.getElementById('send');
+    const widget = document.getElementById('widget');
+    const launcher = document.getElementById('launcher');
 
-    // История диалога живёт на клиенте (сервер без состояния).
     const messages = [];
+    let greeted = false;
 
     function scrollDown() { chat.scrollTop = chat.scrollHeight; }
+
+    function openChat() {
+      widget.classList.add('open');
+      launcher.classList.add('hidden');
+      if (!greeted) {
+        addBubble('bot', '¡Hola! Soy el asistente de Número Uno. Puedo ayudarte con el menú, los horarios o reservar mesa en cualquiera de nuestros tres restaurantes. ¿Qué te apetece? · Hi! I can help you in English too.');
+        greeted = true;
+      }
+      setTimeout(() => input.focus(), 100);
+    }
+    function closeChat() {
+      widget.classList.remove('open');
+      launcher.classList.remove('hidden');
+    }
+    // Клик по адресу на странице открывает чат и сразу заводит бронь в этот ресторан.
+    function bookAt(place) {
+      openChat();
+      setTimeout(() => sendMessage('Quiero reservar mesa en ' + place), 250);
+    }
 
     function addBubble(role, text) {
       const el = document.createElement('div');
@@ -176,7 +309,7 @@
     function addBookingCard(b) {
       const el = document.createElement('div');
       el.className = 'booking';
-      const prefillHint = b.datePrefill
+      const hint = b.datePrefill
         ? 'Se abre el widget de reservas con la fecha ya puesta. Recibirás el email de confirmación como siempre.'
         : 'Se abre la página de reservas del restaurante para confirmar tu mesa.';
       el.innerHTML = `
@@ -188,7 +321,7 @@
         <div class="row"><b>Personas</b><span>${b.guests ?? '—'}</span></div>
         <div class="row"><b>Nombre</b><span>${b.name || '—'}</span></div>
         <a class="confirm" href="${b.url}" target="_blank" rel="noopener">Confirmar reserva</a>
-        <p class="hint">${prefillHint}</p>`;
+        <p class="hint">${hint}</p>`;
       chat.appendChild(el);
       scrollDown();
     }
@@ -199,7 +332,6 @@
       typing.classList.add('show');
       scrollDown();
       send.disabled = true;
-
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
@@ -208,7 +340,6 @@
         });
         const data = await res.json();
         typing.classList.remove('show');
-
         if (!res.ok) {
           addBubble('bot', 'Perdona, un problemilla técnico. Inténtalo otra vez. · Sorry, a technical glitch. Please try again.');
           return;
@@ -235,10 +366,6 @@
       input.value = '';
       sendMessage(text);
     });
-
-    // Приветствие бота (ES, как основной язык сайта). Не идёт в историю модели —
-    // просто первый экран; модель сама подстроит язык под первое сообщение гостя.
-    addBubble('bot', '¡Hola! Soy el asistente de Número Uno Steakhouse. Puedo ayudarte con el menú, los horarios o reservar mesa en cualquiera de nuestros tres restaurantes. ¿Qué te apetece? · Hi! I can also help you in English.');
   </script>
 </body>
 </html>

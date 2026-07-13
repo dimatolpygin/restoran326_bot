@@ -4,8 +4,20 @@
 // Запуск:  node scripts/serve.js   →   открыть http://localhost:3000
 
 import { createServer } from 'node:http';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { extname } from 'node:path';
 import handler from '../api/chat.js';
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript',
+  '.css': 'text/css',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+};
 
 // Загрузка .env.
 try {
@@ -19,7 +31,7 @@ try {
 }
 
 const PORT = process.env.PORT || 3000;
-const page = readFileSync(new URL('../public/index.html', import.meta.url));
+const PUBLIC = new URL('../public/', import.meta.url);
 
 createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/api/chat') {
@@ -40,9 +52,17 @@ createServer(async (req, res) => {
     });
     return;
   }
-  // Всё остальное — страница чата.
+  // Статика из public/: отдаём файл, если существует, иначе index.html.
+  const path = (req.url || '/').split('?')[0];
+  const rel = path === '/' ? 'index.html' : path.replace(/^\/+/, '');
+  const fileUrl = new URL(rel, PUBLIC);
+  if (existsSync(fileUrl)) {
+    res.writeHead(200, { 'Content-Type': MIME[extname(rel)] || 'application/octet-stream' });
+    res.end(readFileSync(fileUrl));
+    return;
+  }
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-  res.end(page);
+  res.end(readFileSync(new URL('index.html', PUBLIC)));
 }).listen(PORT, () => {
   console.log(`\n  Демо Número Uno:  http://localhost:${PORT}\n  Ctrl+C — остановить\n`);
 });
