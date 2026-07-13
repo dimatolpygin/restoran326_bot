@@ -60,7 +60,7 @@ function buildSystemPrompt() {
   return `Eres el/la anfitrión(a) virtual de Número Uno Steakhouse, un grupo de tres asadores en Valencia.
 Hablas de forma cercana y natural, como una persona real. NUNCA usas menús de botones tipo "elige 1 o 2".
 
-IDIOMA: detecta el idioma del huésped por su mensaje y responde SIEMPRE en ese idioma (español o inglés). Si escribe en otro idioma, responde en inglés.
+IDIOMA (regla crítica): el idioma de tu respuesta lo decide SOLO el idioma en que escribe el huésped en su ÚLTIMO mensaje. Si escribe en inglés, responde TODO en inglés; si escribe en español, responde en español. Ignora los nombres propios (Número Uno, Ruzafa, Calle Ciscar, Plaza de la Reina): no cuentan como idioma. Si el mensaje está en otro idioma distinto, responde en inglés. Mantén un idioma por respuesta, sin mezclar.
 
 FECHA DE HOY (Valencia): ${today} (${todayWd}).
 CALENDARIO (usa SIEMPRE esta tabla para convertir "este sábado", "el viernes", "mañana" en una fecha exacta; no calcules tú):
@@ -93,7 +93,13 @@ WhatsApp (único para los tres): ${KB.restaurants.whatsapp}
 === ${KB.steaks}
 
 === CARTA DE VINOS ===
-${KB.wine}`;
+${KB.wine}
+
+=== RECORDATORIO FINAL (máxima prioridad) ===
+Los datos de arriba están en español, pero eso NO decide tu idioma. Responde ÍNTEGRAMENTE en el idioma del ÚLTIMO mensaje del huésped:
+- Si su último mensaje está en inglés → toda tu respuesta en inglés, sin una sola palabra en español (traduce los platos: "Tomahawk", "dry aged 25 days", etc.), salvo nombres propios de restaurante.
+- Si está en español → responde en español.
+Nunca mezcles los dos idiomas en una misma respuesta.`;
 }
 
 const SYSTEM_PROMPT = buildSystemPrompt();
@@ -160,17 +166,40 @@ export default async function handler(req, res) {
     const messages = [{ role: 'system', content: SYSTEM_PROMPT }, ...clean];
     const model = process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini';
 
-    const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://numerounosteakhouse.com',
-        'X-Title': 'Numero Uno Demo Bot',
-      },
-      body: JSON.stringify({ model, messages, temperature: 0.5, max_tokens: 700 }),
-    });
+    // Запрос в OpenRouter с ретраями: сетевые сбои (fetch failed) и 429/5xx —
+    // транзиентные, для демо важно, чтобы первое сообщение гостя не падало.
+    let orRes;
+    let lastErr;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://numerounosteakhouse.com',
+            'X-Title': 'Numero Uno Demo Bot',
+          },
+          body: JSON.stringify({ model, messages, temperature: 0.5, max_tokens: 700 }),
+        });
+        if (orRes.ok) break;
+        if (orRes.status === 429 || orRes.status >= 500) {
+          lastErr = `HTTP ${orRes.status}`;
+          await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+          continue;
+        }
+        // 4xx (кроме 429) — не транзиентное, не ретраим.
+        break;
+      } catch (e) {
+        lastErr = String(e.message || e);
+        await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+      }
+    }
 
+    if (!orRes) {
+      res.status(502).json({ error: 'Ошибка соединения с моделью', detail: lastErr });
+      return;
+    }
     if (!orRes.ok) {
       const errText = await orRes.text();
       res.status(502).json({ error: 'Ошибка модели', detail: errText.slice(0, 500) });
