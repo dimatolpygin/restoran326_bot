@@ -67,7 +67,7 @@ CÓMO RESPONDES (muy importante):
 - Precios: solo el de la pieza por la que preguntan, no todos. Datos exactos de la base, nunca inventes platos, vinos ni precios.
 - Natural: sin servilismo ("excelente elección", "con mucho gusto") ni pomposidad ("amplia variedad", "solución ideal"). Sin guiones largos. SIN emojis.
 
-IDIOMA (regla crítica): el idioma de tu respuesta lo decide SOLO el idioma en que escribe el huésped en su ÚLTIMO mensaje. Si escribe en inglés, responde TODO en inglés; si escribe en español, responde en español. Ignora los nombres propios (Número Uno, Ruzafa, Calle Ciscar, Plaza de la Reina): no cuentan como idioma. Si el mensaje está en otro idioma distinto, responde en inglés. Mantén un idioma por respuesta, sin mezclar.
+IDIOMA (regla crítica): responde SIEMPRE en el idioma del ÚLTIMO mensaje del huésped. Los idiomas principales de la casa son español e inglés, pero si el huésped escribe en otro idioma (ruso, francés, etc.), respóndele en ESE idioma. Ignora los nombres propios (Número Uno, Ruzafa, Calle Ciscar, Plaza de la Reina): no cuentan como idioma. Nunca mezcles dos idiomas en una misma respuesta.
 
 FECHA DE HOY (Valencia): ${today} (${todayWd}).
 CALENDARIO (usa SIEMPRE esta tabla para convertir "este sábado", "el viernes", "mañana" en una fecha exacta; no calcules tú):
@@ -103,7 +103,7 @@ WhatsApp (único para los tres): ${KB.restaurants.whatsapp}
 ${KB.wine}
 
 === RECORDATORIO FINAL (máxima prioridad) ===
-1. IDIOMA: los datos de arriba están en español, pero eso NO decide tu idioma. Responde ÍNTEGRAMENTE en el idioma del ÚLTIMO mensaje del huésped. Si su último mensaje está en inglés, toda tu respuesta en inglés (traduce los platos), salvo nombres propios de restaurante. Si está en español, en español. Nunca mezcles los dos idiomas.
+1. IDIOMA: los datos de arriba están en español, pero eso NO decide tu idioma. Responde ÍNTEGRAMENTE en el idioma del ÚLTIMO mensaje del huésped (español, inglés u otro que use), traduciendo los platos salvo nombres propios de restaurante. Nunca mezcles idiomas en una misma respuesta.
 2. NO VUELQUES LA CARTA: ante una pregunta amplia, orienta con una pregunta corta y recomienda 2-3 opciones. Breve, tono de chat, sin listas largas.`;
 }
 
@@ -189,11 +189,14 @@ export default async function handler(req, res) {
     const messages = [{ role: 'system', content: SYSTEM_PROMPT }, ...clean];
     const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4.6';
 
-    // Запрос в OpenRouter с ретраями: сетевые сбои (fetch failed) и 429/5xx —
-    // транзиентные, для демо важно, чтобы первое сообщение гостя не падало.
+    // Запрос в OpenRouter с ретраями: сетевые сбои (fetch failed), таймаут и 429/5xx —
+    // транзиентные. Для демо важно, чтобы сообщение гостя не падало посреди диалога.
+    // На каждую попытку — таймаут по AbortController (зависший коннект не держим).
     let orRes;
     let lastErr;
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 22000);
       try {
         orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
@@ -204,18 +207,22 @@ export default async function handler(req, res) {
             'X-Title': 'Numero Uno Demo Bot',
           },
           body: JSON.stringify({ model, messages, temperature: 0.5, max_tokens: 700 }),
+          signal: ctrl.signal,
         });
+        clearTimeout(timer);
         if (orRes.ok) break;
         if (orRes.status === 429 || orRes.status >= 500) {
           lastErr = `HTTP ${orRes.status}`;
-          await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+          orRes = null;
+          await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
           continue;
         }
         // 4xx (кроме 429) — не транзиентное, не ретраим.
         break;
       } catch (e) {
-        lastErr = String(e.message || e);
-        await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+        clearTimeout(timer);
+        lastErr = e.name === 'AbortError' ? 'timeout' : String(e.message || e);
+        await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
       }
     }
 

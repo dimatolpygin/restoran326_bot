@@ -210,7 +210,7 @@
         typing.classList.remove('show');
 
         if (!res.ok) {
-          addBubble('bot', 'Perdona, ha habido un problema técnico. Inténtalo de nuevo en un momento.');
+          addBubble('bot', 'Perdona, un problemilla técnico. Inténtalo otra vez. · Sorry, a technical glitch. Please try again.');
           return;
         }
         const reply = data.reply || '';
@@ -221,7 +221,7 @@
         if (data.booking) addBookingCard(data.booking);
       } catch (e) {
         typing.classList.remove('show');
-        addBubble('bot', 'No he podido conectar. Revisa tu conexión e inténtalo otra vez.');
+        addBubble('bot', 'No he podido conectar. Revisa tu conexión. · Couldn’t connect. Check your connection.');
       } finally {
         send.disabled = false;
         input.focus();
