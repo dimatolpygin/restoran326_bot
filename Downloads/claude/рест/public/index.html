@@ -52,30 +52,11 @@
     .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
     .flag { font-size: 15px; }
 
-    .hero {
-      position: relative;
-      min-height: 74vh;
-      display: flex;
-      align-items: flex-end;
-      background: #000 url('/hero.jpg') no-repeat center right;
-      background-size: cover;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.25) 100%);
-    }
-    .hero-inner { position: relative; padding: 0 32px 60px; max-width: 780px; }
-    .hero h1 {
-      font-size: clamp(38px, 6.5vw, 78px);
-      line-height: 0.98;
-      margin: 0 0 18px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: -1px;
-    }
-    .hero p { font-size: clamp(15px, 2vw, 19px); color: #e8e8e8; max-width: 520px; margin: 0 0 26px; }
+    .hero { background: #000; padding: 34px 26px 6px; }
+    .hero-card { position: relative; max-width: 1180px; margin: 0 auto; border-radius: 10px; overflow: hidden; line-height: 0; }
+    .hero-card img { width: 100%; height: auto; display: block; }
+    /* Прозрачная кликабельная зона поверх вшитой кнопки «Quiero ver» */
+    .hero-cta { position: absolute; left: 3%; top: 79%; width: 17%; height: 11%; cursor: pointer; }
     .btn-red {
       display: inline-block;
       background: var(--red);
@@ -227,10 +208,9 @@
   </nav>
 
   <section class="hero">
-    <div class="hero-inner">
-      <h1>Los mejores steaks<br />de la ciudad!</h1>
-      <p>Jugosos, tiernos y perfectamente cocinados. El placer definitivo para los amantes de la carne.</p>
-      <button class="btn-red" onclick="openChat()">Reservar mesa</button>
+    <div class="hero-card">
+      <img src="/hero.jpg" alt="Los mejores steaks de la ciudad" />
+      <a class="hero-cta" onclick="openChat()" aria-label="Reservar mesa"></a>
     </div>
   </section>
 
