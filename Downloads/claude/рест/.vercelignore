@@ -1,0 +1,18 @@
+# В прод уходит только рантайм. Секреты и служебные файлы исключаем.
+.env
+.env.*
+переписка.txt
+доступы.txt
+дизайн.png
+
+# исходники/резерв, кодом не читаются (канон уже в menu_all/steaks_all/wine_all + restaurants.json)
+wine-list.txt
+our-steaks.txt
+info_restaran.txt
+
+# служебное
+docs/
+scripts/
+node_modules/
+.vercel/
+.git/
