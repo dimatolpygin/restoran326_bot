@@ -1,0 +1,14 @@
+{
+  "name": "numerouno-demo-bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Демо ИИ-бота Número Uno Steakhouse: веб-чат ES/EN + сценарий брони с доведением до Ágora",
+  "scripts": {
+    "dev": "vercel dev",
+    "test:chat": "node scripts/smoke.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

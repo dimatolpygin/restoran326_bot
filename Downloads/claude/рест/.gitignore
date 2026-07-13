@@ -1,0 +1,10 @@
+# секреты — в репозиторий не уходят
+.env
+.env.local
+.env.*.local
+
+# зависимости и артефакты
+node_modules/
+.vercel/
+.DS_Store
+npm-debug.log*

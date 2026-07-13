@@ -1,0 +1,48 @@
+{
+  "brand": "Número Uno Steakhouse",
+  "whatsapp": "664 13 91 05",
+  "site": "https://numerounosteakhouse.com",
+  "dateParam": "date",
+  "restaurants": [
+    {
+      "id": "ciscar",
+      "name": "Número Uno · Calle Ciscar",
+      "address": "Calle Ciscar 10B, 46005 Valencia",
+      "area": "Ruzafa",
+      "phone": "960 43 15 18",
+      "hours": { "lunch": "13:00–16:00", "dinner": "20:00–24:00", "days": "Lunes–Domingo" },
+      "booking": {
+        "provider": "site",
+        "url": "https://numerounosteakhouse.com/#popup:order-es-ciscar",
+        "datePrefill": false,
+        "note": "В процессе перехода на Ágora. Пока бронь через страницу ресторана, без предзаполнения даты."
+      }
+    },
+    {
+      "id": "corretgeria",
+      "name": "Número Uno · Calle Corretgeria",
+      "address": "Calle Corretgeria 7, 46001 Valencia",
+      "area": "Plaza de la Reina",
+      "phone": "960 62 56 80",
+      "hours": { "lunch": "13:00–16:00", "dinner": "19:00–24:00", "days": "Lunes–Domingo" },
+      "booking": {
+        "provider": "agora",
+        "url": "https://bookings.agorapos.com/reservas/widget/1117/calendario/d9de921f0f4dbadc4cbc890b8c1028ddb7c914da",
+        "datePrefill": true
+      }
+    },
+    {
+      "id": "baleares",
+      "name": "Número Uno · Avenida Baleares",
+      "address": "Avenida Baleares 32, 46023 Valencia",
+      "area": "",
+      "phone": "860 911 136",
+      "hours": { "lunch": "13:00–16:00", "dinner": "19:00–24:00", "days": "Lunes–Domingo" },
+      "booking": {
+        "provider": "agora",
+        "url": "https://bookings.agorapos.com/reservas/widget/1684/calendar/8399ee5f4bad1b821b966006ef77b24e27c83684",
+        "datePrefill": true
+      }
+    }
+  ]
+}
