@@ -57,8 +57,15 @@ function buildSystemPrompt() {
   const { today, todayWd, table } = madridCalendar();
   const ids = KB.restaurants.restaurants.map((r) => r.id).join(', ');
 
-  return `Eres el/la anfitrión(a) virtual de Número Uno Steakhouse, un grupo de tres asadores en Valencia.
-Hablas de forma cercana y natural, como una persona real. NUNCA usas menús de botones tipo "elige 1 o 2".
+  return `Eres el anfitrión de Número Uno Steakhouse, un grupo de tres asadores en Valencia. Eres una persona real que atiende el chat: cercano, experto en carne, ayudas al huésped a elegir y a reservar. El huésped no debe notar que eres una IA. NUNCA usas menús de botones tipo "elige 1 o 2".
+
+CÓMO RESPONDES (muy importante):
+- Como en un chat de mensajería: breve y al grano, normalmente 1-2 frases. Nada de textos largos ni parrafadas.
+- NUNCA vuelques la carta entera ni listas largas. Si preguntan algo amplio ("¿qué steaks tenéis?", "¿qué hay de comer?"), NO enumeres todo. Haz UNA pregunta que oriente (¿para cuántos sois?, ¿os va algo clásico o daros un capricho?, ¿con hueso o sin?) y/o recomienda 2-3 opciones que encajen, como haría un buen camarero.
+- Recomienda con criterio de experto: "para dos, el Rib-Eye va genial", "si es una ocasión especial, el Tomahawk madurado es el rey", "para picar antes, el tartar está muy bueno". Guías, no eres un catálogo.
+- Sin markdown: nada de negritas, títulos, guiones de lista ni numeraciones. Texto normal de chat.
+- Precios: solo el de la pieza por la que preguntan, no todos. Datos exactos de la base, nunca inventes platos, vinos ni precios.
+- Natural: sin servilismo ("excelente elección", "con mucho gusto") ni pomposidad ("amplia variedad", "solución ideal"). Sin guiones largos. SIN emojis.
 
 IDIOMA (regla crítica): el idioma de tu respuesta lo decide SOLO el idioma en que escribe el huésped en su ÚLTIMO mensaje. Si escribe en inglés, responde TODO en inglés; si escribe en español, responde en español. Ignora los nombres propios (Número Uno, Ruzafa, Calle Ciscar, Plaza de la Reina): no cuentan como idioma. Si el mensaje está en otro idioma distinto, responde en inglés. Mantén un idioma por respuesta, sin mezclar.
 
@@ -96,13 +103,29 @@ WhatsApp (único para los tres): ${KB.restaurants.whatsapp}
 ${KB.wine}
 
 === RECORDATORIO FINAL (máxima prioridad) ===
-Los datos de arriba están en español, pero eso NO decide tu idioma. Responde ÍNTEGRAMENTE en el idioma del ÚLTIMO mensaje del huésped:
-- Si su último mensaje está en inglés → toda tu respuesta en inglés, sin una sola palabra en español (traduce los platos: "Tomahawk", "dry aged 25 days", etc.), salvo nombres propios de restaurante.
-- Si está en español → responde en español.
-Nunca mezcles los dos idiomas en una misma respuesta.`;
+1. IDIOMA: los datos de arriba están en español, pero eso NO decide tu idioma. Responde ÍNTEGRAMENTE en el idioma del ÚLTIMO mensaje del huésped. Si su último mensaje está en inglés, toda tu respuesta en inglés (traduce los platos), salvo nombres propios de restaurante. Si está en español, en español. Nunca mezcles los dos idiomas.
+2. NO VUELQUES LA CARTA: ante una pregunta amplia, orienta con una pregunta corta y recomienda 2-3 opciones. Breve, tono de chat, sin listas largas.`;
 }
 
 const SYSTEM_PROMPT = buildSystemPrompt();
+
+// Постобработка ответа: чистим артефакты ИИ кодом (стиль держит промпт, чистоту — код).
+// Убираем длинное тире, markdown-жирный/заголовки и маркеры списков — это обычный чат.
+function cleanReply(text) {
+  if (!text) return text;
+  let t = text;
+  t = t.replace(/(\d)\s*[—–]\s*(\d)/g, '$1-$2'); // диапазоны чисел: 10—15 → 10-15
+  t = t.replace(/\s*[—–]\s*/g, ', '); // тире между словами → запятая
+  t = t.replace(/\*\*(.*?)\*\*/g, '$1'); // **жирный** → обычный
+  t = t.replace(/\*(.*?)\*/g, '$1'); // *курсив* → обычный
+  t = t.replace(/^#{1,6}\s*/gm, ''); // ### заголовки
+  t = t.replace(/^\s*[-*]\s+/gm, ''); // маркеры списков в начале строк
+  t = t.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}️\u{1F1E6}-\u{1F1FF}]/gu, ''); // эмодзи
+  t = t.replace(/\s+([,.!?…])/g, '$1'); // пробел перед пунктуацией (после снятия эмодзи)
+  t = t.replace(/[ \t]{2,}/g, ' '); // двойные пробелы
+  t = t.replace(/\n{3,}/g, '\n\n'); // лишние пустые строки
+  return t.trim();
+}
 
 // Парсинг маркера брони из ответа модели: вырезаем его из текста и строим ссылку Ágora.
 function extractBooking(text) {
@@ -164,7 +187,7 @@ export default async function handler(req, res) {
     }
 
     const messages = [{ role: 'system', content: SYSTEM_PROMPT }, ...clean];
-    const model = process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini';
+    const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4.6';
 
     // Запрос в OpenRouter с ретраями: сетевые сбои (fetch failed) и 429/5xx —
     // транзиентные, для демо важно, чтобы первое сообщение гостя не падало.
@@ -210,7 +233,7 @@ export default async function handler(req, res) {
     const raw = data.choices?.[0]?.message?.content?.trim() || '';
     const { clean: reply, booking } = extractBooking(raw);
 
-    res.status(200).json({ reply, booking });
+    res.status(200).json({ reply: cleanReply(reply), booking });
   } catch (e) {
     res.status(500).json({ error: 'Внутренняя ошибка', detail: String(e.message || e) });
   }
