@@ -52,43 +52,11 @@
     .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
     .flag { font-size: 15px; }
 
-    /* Hero: чистое фото фоном (cover) + HTML-текст поверх. Адаптивный: высокий на
-       мобиле (как на их сайте), широкий на десктопе. Скруглённая карточка с полями. */
-    .hero { background: #000; padding: 14px; }
-    .hero-card {
-      position: relative;
-      border-radius: 14px;
-      overflow: hidden;
-      min-height: 80vh;
-      display: flex;
-      align-items: flex-end;
-      background: #000;
-    }
-    .hero-card .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .hero-card::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.12) 100%),
-                  linear-gradient(0deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 45%);
-    }
-    .hero-content { position: relative; z-index: 1; padding: 0 26px 44px; max-width: 620px; }
-    .hero-content h1 {
-      font-size: clamp(36px, 8.5vw, 74px);
-      line-height: 0.98;
-      margin: 0 0 14px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: -0.5px;
-    }
-    .hero-content p { font-size: clamp(15px, 2.4vw, 19px); color: #eaeaea; margin: 0 0 22px; max-width: 460px; }
-    .hero-count { position: absolute; top: 18px; left: 24px; z-index: 1; color: #fff; font-size: 13px; font-weight: 600; opacity: 0.85; letter-spacing: 1px; }
-    .hero-arrows { position: absolute; top: 14px; right: 16px; z-index: 1; display: flex; gap: 8px; }
-    .hero-arrows span { width: 46px; height: 32px; border-radius: 999px; background: #fff; color: var(--red); display: flex; align-items: center; justify-content: center; font-size: 15px; }
-    @media (min-width: 860px) {
-      .hero { padding: 22px; }
-      .hero-card { min-height: 66vh; }
-      .hero-content { padding: 0 46px 56px; max-width: 640px; }
-    }
+    .hero { background: #000; padding: 34px 26px 6px; }
+    .hero-card { position: relative; max-width: 1180px; margin: 0 auto; border-radius: 10px; overflow: hidden; line-height: 0; }
+    .hero-card img { width: 100%; height: auto; display: block; }
+    /* Прозрачная кликабельная зона поверх вшитой кнопки «Quiero ver» */
+    .hero-cta { position: absolute; left: 3%; top: 79%; width: 17%; height: 11%; cursor: pointer; }
     .btn-red {
       display: inline-block;
       background: var(--red);
@@ -130,13 +98,9 @@
 
     .footer-note { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
 
-    .hamburger { display: none; font-size: 21px; cursor: pointer; margin-left: 6px; }
     @media (max-width: 720px) {
       .nav-links { display: none; }
-      .hamburger { display: inline-flex; }
-      .reserva { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .reserva .pills { margin-left: 0; width: 100%; flex-direction: column; }
-      .reserva .pill { width: 100%; text-align: center; }
+      .reserva .pills { margin-left: 0; }
     }
 
     /* ---------- Плавающий чат-виджет ---------- */
@@ -240,19 +204,13 @@
       <a href="#">Franquicia</a>
       <a href="#">Contacto</a>
     </div>
-    <div class="nav-right"><span class="flag">🇪🇸</span><span class="flag">🇬🇧</span><span class="hamburger" onclick="openChat()" aria-label="Menú">☰</span></div>
+    <div class="nav-right"><span class="flag">🇪🇸</span><span class="flag">🇬🇧</span></div>
   </nav>
 
   <section class="hero">
     <div class="hero-card">
-      <img class="bg" src="/steak-bg.jpg" alt="" />
-      <div class="hero-count">1 / 4</div>
-      <div class="hero-arrows"><span>&larr;</span><span>&rarr;</span></div>
-      <div class="hero-content">
-        <h1>Los mejores steaks de la ciudad!</h1>
-        <p>Jugosos, tiernos y perfectamente cocinados. El placer definitivo para los amantes de la carne.</p>
-        <button class="btn-red" onclick="openChat()">Reservar mesa</button>
-      </div>
+      <img src="/hero.jpg" alt="Los mejores steaks de la ciudad" />
+      <a class="hero-cta" onclick="openChat()" aria-label="Reservar mesa"></a>
     </div>
   </section>
 
