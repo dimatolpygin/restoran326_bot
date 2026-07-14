@@ -52,11 +52,45 @@
     .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
     .flag { font-size: 15px; }
 
-    .hero { background: #000; padding: 34px 26px 6px; }
-    .hero-card { position: relative; max-width: 1180px; margin: 0 auto; border-radius: 10px; overflow: hidden; line-height: 0; }
-    .hero-card img { width: 100%; height: auto; display: block; }
-    /* Прозрачная кликабельная зона поверх вшитой кнопки «Quiero ver» */
-    .hero-cta { position: absolute; left: 3%; top: 79%; width: 17%; height: 11%; cursor: pointer; }
+    /* Hero: настоящее фото стейка (1440px) фоном cover + HTML-текст поверх.
+       Адаптивный: высокий на мобиле (как на их сайте), широкий на десктопе. */
+    .hero { background: #000; padding: 22px; }
+    .hero-card {
+      position: relative;
+      max-width: 1180px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 62vh;
+      display: flex;
+      align-items: flex-end;
+      background: #000;
+    }
+    .hero-card .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .hero-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 48%, rgba(0,0,0,0.05) 100%),
+                  linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 42%);
+    }
+    .hero-content { position: relative; z-index: 1; padding: 0 44px 50px; max-width: 640px; }
+    .hero-content h1 {
+      font-size: clamp(34px, 6vw, 72px);
+      line-height: 0.98;
+      margin: 0 0 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    .hero-content p { font-size: clamp(15px, 2.2vw, 19px); color: #ececec; margin: 0 0 22px; max-width: 470px; }
+    .hero-count { position: absolute; top: 18px; left: 24px; z-index: 1; color: #fff; font-size: 13px; font-weight: 600; opacity: 0.85; letter-spacing: 1px; }
+    .hero-arrows { position: absolute; top: 14px; right: 16px; z-index: 1; display: flex; gap: 8px; }
+    .hero-arrows span { width: 46px; height: 32px; border-radius: 999px; background: #fff; color: var(--red); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    @media (max-width: 720px) {
+      .hero { padding: 12px; }
+      .hero-card { min-height: 78vh; }
+      .hero-content { padding: 0 24px 40px; }
+    }
     .btn-red {
       display: inline-block;
       background: var(--red);
@@ -98,9 +132,13 @@
 
     .footer-note { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
 
+    .hamburger { display: none; font-size: 21px; cursor: pointer; margin-left: 6px; }
     @media (max-width: 720px) {
       .nav-links { display: none; }
-      .reserva .pills { margin-left: 0; }
+      .hamburger { display: inline-flex; }
+      .reserva { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .reserva .pills { margin-left: 0; width: 100%; flex-direction: column; }
+      .reserva .pill { width: 100%; text-align: center; }
     }
 
     /* ---------- Плавающий чат-виджет ---------- */
@@ -204,13 +242,19 @@
       <a href="#">Franquicia</a>
       <a href="#">Contacto</a>
     </div>
-    <div class="nav-right"><span class="flag">🇪🇸</span><span class="flag">🇬🇧</span></div>
+    <div class="nav-right"><span class="flag">🇪🇸</span><span class="flag">🇬🇧</span><span class="hamburger" onclick="openChat()" aria-label="Menú">☰</span></div>
   </nav>
 
   <section class="hero">
     <div class="hero-card">
-      <img src="/hero.jpg" alt="Los mejores steaks de la ciudad" />
-      <a class="hero-cta" onclick="openChat()" aria-label="Reservar mesa"></a>
+      <img class="bg" src="/steak-bg.jpg" alt="" />
+      <div class="hero-count">1 / 4</div>
+      <div class="hero-arrows"><span>&larr;</span><span>&rarr;</span></div>
+      <div class="hero-content">
+        <h1>Los mejores steaks de la ciudad!</h1>
+        <p>Jugosos, tiernos y perfectamente cocinados. El placer definitivo para los amantes de la carne.</p>
+        <button class="btn-red" onclick="openChat()">Reservar mesa</button>
+      </div>
     </div>
   </section>
 
