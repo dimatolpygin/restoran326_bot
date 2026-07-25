@@ -9,9 +9,12 @@ const breakageScene = require('./scenes/breakage.scene');
 const statScene = require('./scenes/stat.scene');
 const startCommand = require('./commands/start');
 const setupBreakageCallbacks = require('./callbacks/breakage');
+const proxyAgent = require('../lib/proxy');
 
 function createBot() {
-  const bot = new Telegraf(process.env.BOT_TOKEN);
+  const bot = new Telegraf(process.env.BOT_TOKEN, {
+    telegram: { agent: proxyAgent },
+  });
 
   // ── Session через Redis (с fallback на память при недоступности) ──
   const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {

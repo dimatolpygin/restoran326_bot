@@ -129,6 +129,7 @@ router.post('/:id/delete', async (req, res) => {
 async function uploadPhotoToTelegram(file) {
   const axios = require('axios');
   const FormData = require('form-data');
+  const proxyAgent = require('../../lib/proxy');
 
   const form = new FormData();
   form.append('photo', file.buffer, {
@@ -146,6 +147,8 @@ async function uploadPhotoToTelegram(file) {
     {
       params: { chat_id: chatId },
       headers: form.getHeaders(),
+      httpsAgent: proxyAgent,
+      proxy: false,
     }
   );
 
@@ -156,7 +159,8 @@ async function uploadPhotoToTelegram(file) {
   // Удаляем сообщение сразу после получения file_id
   await axios.post(
     `https://api.telegram.org/bot${token}/deleteMessage`,
-    { chat_id: chatId, message_id: messageId }
+    { chat_id: chatId, message_id: messageId },
+    { httpsAgent: proxyAgent, proxy: false }
   ).catch(() => {});
 
   return fileId;
