@@ -10,6 +10,10 @@ const statScene = require('./scenes/stat.scene');
 const startCommand = require('./commands/start');
 const setupBreakageCallbacks = require('./callbacks/breakage');
 
+// Адрес админки для кнопки WebApp. Telegram принимает только публичный
+// HTTPS с валидным сертификатом — localhost и http работать не будут.
+const WEBAPP_URL = process.env.WEBAPP_URL || 'https://sol-dobra.ru/';
+
 function createBot() {
   const bot = new Telegraf(process.env.BOT_TOKEN);
 
@@ -70,7 +74,7 @@ function createBot() {
     await ctx.reply('Панель управления:', {
       reply_markup: {
         inline_keyboard: [[
-          { text: '⚙️ Открыть админку', web_app: { url: 'https://anastasia-kwork.store/' } }
+          { text: '⚙️ Открыть админку', web_app: { url: WEBAPP_URL } }
         ]]
       }
     });
