@@ -136,18 +136,35 @@ async function uploadPhotoToTelegram(file) {
     contentType: file.mimetype,
   });
 
-  // Отправляем фото напрямую администратору (не в групповой чат)
-  const chatId = process.env.PHOTO_UPLOAD_USER_ID || '2042819654';
+  // Отправляем фото напрямую администратору (не в групповой чат).
+  // Несколько ID через запятую: первый — основной, остальные — запасные.
+  const chatIds = (process.env.PHOTO_UPLOAD_USER_ID || '2042819654,8914616487')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
   const token = process.env.BOT_TOKEN;
 
-  const response = await axios.post(
-    `https://api.telegram.org/bot${token}/sendPhoto`,
-    form,
-    {
-      params: { chat_id: chatId },
-      headers: form.getHeaders(),
+  let response;
+  let chatId;
+  let lastError;
+  for (const id of chatIds) {
+    try {
+      response = await axios.post(
+        `https://api.telegram.org/bot${token}/sendPhoto`,
+        form.getBuffer(),
+        {
+          params: { chat_id: id },
+          headers: form.getHeaders(),
+        }
+      );
+      chatId = id;
+      break;
+    } catch (err) {
+      lastError = err;
+      console.error(`[items] sendPhoto failed for chat ${id}:`, err.response?.data?.description || err.message);
     }
-  );
+  }
+  if (!response) throw lastError;
 
   const photoSizes = response.data.result.photo;
   const fileId = photoSizes[photoSizes.length - 1].file_id;
