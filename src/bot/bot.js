@@ -56,6 +56,11 @@ function createBot() {
     })
   );
 
+  // ── Callbacks из группы (accept/reject) ─────────────────────────
+  // Регистрируем до сцен: иначе, если у админа в группе «залипла» сцена
+  // (например, auth), stage перехватит нажатие и кнопка не сработает.
+  setupBreakageCallbacks(bot);
+
   // ── Scenes ──────────────────────────────────────────────────────
   const stage = new Scenes.Stage([authScene, catalogWarehouseScene, breakageScene, statScene]);
   bot.use(stage.middleware());
@@ -83,9 +88,6 @@ function createBot() {
   bot.command('stat', async (ctx) => {
     await ctx.scene.enter('stat');
   });
-
-  // ── Callbacks из группы (accept/reject) ─────────────────────────
-  setupBreakageCallbacks(bot);
 
   // ── Обработка ошибок ────────────────────────────────────────────
   bot.catch((err, ctx) => {
